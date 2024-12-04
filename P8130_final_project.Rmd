@@ -9,6 +9,9 @@ editor_options:
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(car)
 ```
 
 # Appendix
@@ -21,10 +24,44 @@ survival_df = read_csv("data/Project_2_data.csv") |>
 ```
 
 
+- Data Description
+
+```{r}
+str(survival_df)
+```
+
+Numeric variables include `age`, `tumor_size`, `regional_node_examined`, `reginol_node_positive`, and `survival_months`.
+
+These are continuous variables that can be used for our later regression analysis.
+
+Categorical variables include `race`, `marital_status`, `t_stage`, `n_stage`, `x6th_stage`, `differentiate`, `grade`, `a_stage`, `estrogen_status`, `progesterone_status`, and `status`.
+
+These can be converted into factors for later analysis.
 
 
+```{r}
+summary(survival_df)
+```
+
+The wide range of values in variables such as `tumor_size`, `regional_node_examined`, and `survival_months` indicates the need to explore relationships and their potential nonlinearities with survival, giving us a possible analytical regression model.
 
 
+```{r}
+colSums(is.na(survival_df))
+```
+
+We can conclude that no missing values are present in this dataset across all variables.
+
+- Data Visualization
+
+```{r}
+survival_df |> 
+  ggplot(aes(age)) + 
+  geom_histogram(fill = "blue") + 
+  theme_minimal()
+```
+
+The histogram shows the age distribution of patients. Most patients are aged between 40 and 70 years. The data is well spread across middle and older age groups, making it possible for age-related analysis. Therefore, age will likely be a significant predictor for later analysis.
 
 
 
