@@ -36,7 +36,25 @@ These are continuous variables that can be used for our later regression analysi
 
 Categorical variables include `race`, `marital_status`, `t_stage`, `n_stage`, `x6th_stage`, `differentiate`, `grade`, `a_stage`, `estrogen_status`, `progesterone_status`, and `status`.
 
-These can be converted into factors for later analysis.
+Then we will convert these variables into factors.
+
+
+```{r}
+survival_df = survival_df |>
+  mutate(
+    race = factor(race),
+    marital_status = factor(marital_status),
+    t_stage = factor(t_stage),
+    n_stage = factor(n_stage),
+    x6th_stage = factor(x6th_stage),
+    differentiate = factor(differentiate),
+    grade = factor(grade),
+    a_stage = factor(a_stage),
+    estrogen_status = factor(estrogen_status),
+    progesterone_status = factor(progesterone_status),
+    status = factor(status)
+  )
+```
 
 
 ```{r}
@@ -62,6 +80,55 @@ survival_df |>
 ```
 
 The histogram shows the age distribution of patients. Most patients are aged between 40 and 70 years. The data is well spread across middle and older age groups, making it possible for age-related analysis. Therefore, age will likely be a significant predictor for later analysis.
+
+
+```{r}
+ggplot(survival_df, aes(x = tumor_size)) +
+  geom_histogram(fill = "light blue", color = "black") +
+  scale_x_continuous(breaks = seq(0, max(survival_df$tumor_size, na.rm = TRUE), by = 5)) +
+  labs(
+    title = "Distribution of Tumor Size",
+    x = "Tumor Size (mm)",
+    y = "Frequency"
+  )
+```
+
+
+This is the distribution of all tumor sizes, and most of the tumor sizes are smaller than 50 mm. We can find that the most frequent size is around 19 mm, followed by around 14 mm.
+
+
+
+
+```{r}
+ggplot(survival_df, aes(x = regional_node_examined)) +
+  geom_histogram(fill = "light blue", color = "black") +
+  scale_x_continuous(breaks = seq(0, max(survival_df$regional_node_examined, na.rm = TRUE), by = 5)) +
+  labs(
+    title = "Distribution of Examined Regional Node",
+    x = "Examined Regional Node",
+    y = "Frequency"
+  )
+```
+
+This plot maps the frequency of different number of examined regional nodes for each subject. The number of examined regional nodes for most subjects are smaller than 30, and the subjects with nearly 12 examined regional nodes are the most.
+
+
+
+
+```{r}
+ggplot(survival_df, aes(x = reginol_node_positive)) +
+  geom_histogram(fill = "light blue", color = "black") +
+  scale_x_continuous(breaks = seq(0, max(survival_df$reginol_node_positive, na.rm = TRUE), by = 5)) +
+  labs(
+    title = "Distribution of Positive Reginol Node",
+    x = "Positive Reginol Node",
+    y = "Frequency"
+  )
+```
+
+Then is the distribution of different number of positive reginol node for each subject. Over 2500 subjects only have 1 or 2 positive reginol nodes, which is the most frequent number of positive reginol nodes.
+
+
 
 
 ```{r}
@@ -93,4 +160,47 @@ survival_df |>
 ```
 
 The majority of patients in the dataset are White, accounting for approximately 84.82% of the total population. Black patients make up 7.23%, and patients classified as "Other" constitute 7.95%. This imbalance suggests that the dataset is heavily skewed towards White patients, which could influence the generalizability of the findings to other racial groups. 
+
+
+
+#### The distribution of the tumor sizes by t_stage
+
+```{r}
+ggplot(survival_df, aes(x = tumor_size, y = t_stage)) +
+  geom_boxplot(fill = "light blue") +
+  scale_x_continuous(breaks = seq(0, max(survival_df$tumor_size, na.rm = TRUE), by = 10)) +
+  labs(
+    title = "Distribution of Tumor Sizes by T_stage",
+    x = "Tumor Sizes",
+    y = "T_stage"
+  )
+```
+
+In this plot, we explore the tumor size distribution at different T stages. From T1 to T3, as the stage changes, both the mean tumor sizes and IQR become larger. At T4 stage, the IQR of tumor sizes is much larger than others, and the mean size is smaller than the mean size at T3 stage. There are some outliers both ar T1 stage and T3 stage.
+
+
+
+
+#### The distribution of survival months by a_stage
+
+
+```{r}
+ggplot(survival_df, aes(x = survival_months, y = a_stage)) +
+  geom_boxplot(fill = "light blue") +
+  scale_x_continuous(breaks = seq(0, max(survival_df$survival_months, na.rm = TRUE), by = 10)) +
+  labs(
+    title = "Distribution of Survival Months by A_stage",
+    x = "Survival Months",
+    y = "A_stage"
+  )
+```
+
+Through this plot, we can find that subjects with Distant stage have fewer survival months than subjects with Regional stage. However, the IQR of the survival months of subjects with Distant stage is much larger than subjects with Regional stage.
+
+
+
+
+
+
+
 
