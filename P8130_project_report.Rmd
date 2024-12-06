@@ -1,0 +1,18 @@
+---
+title: "P8130_final_project"
+author: "Yifei Yu"
+date: "2024-12-03"
+output: pdf_document
+editor_options: 
+  chunk_output_type: console
+  fontsize: 12pt
+header-includes:
+  - \usepackage{setspace}
+  - \doublespacing
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 
