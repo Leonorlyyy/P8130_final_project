@@ -72,6 +72,8 @@ We can conclude that no missing values are present in this dataset across all va
 
 - Data Visualization
 
+## Some distributions of the variables in this data
+
 ```{r}
 survival_df |> 
   ggplot(aes(age)) + 
@@ -126,6 +128,9 @@ ggplot(survival_df, aes(x = survival_months)) +
   labs(title = "Distribution of Survival Months", x = "Survival Months", y = "Density")
 ```
 
+
+
+## test the relationship between these variables 
 
 ```{r}
 ggplot(survival_df, aes(x = status, y = age)) +
