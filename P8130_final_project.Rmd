@@ -75,7 +75,7 @@ We can conclude that no missing values are present in this dataset across all va
 ```{r}
 survival_df |> 
   ggplot(aes(age)) + 
-  geom_histogram(fill = "blue", color = "black") + 
+  geom_histogram(fill = "light blue", color = "black") + 
   theme_minimal()
 ```
 
@@ -122,14 +122,14 @@ Then is the distribution of different number of positive reginol node for each s
 
 ```{r}
 ggplot(survival_df, aes(x = survival_months)) +
-  geom_histogram(fill = "blue", color = "black") +
+  geom_histogram(fill = "light blue", color = "black") +
   labs(title = "Distribution of Survival Months", x = "Survival Months", y = "Density")
 ```
 
 
 ```{r}
 ggplot(survival_df, aes(x = status, y = age)) +
-  geom_boxplot() +
+  geom_boxplot(fill = "light blue") +
   labs(title = "Age by Survival Status", x = "Survival Status", y = "Age")
 ```
 
