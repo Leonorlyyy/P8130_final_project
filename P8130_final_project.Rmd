@@ -72,16 +72,25 @@ We can conclude that no missing values are present in this dataset across all va
 
 - Data Visualization
 
-## Some distributions of the variables in this data
+# Some distributions of the variables in this data
+
+## Distribution of age
 
 ```{r}
 survival_df |> 
   ggplot(aes(age)) + 
   geom_histogram(fill = "light blue", color = "black") + 
-  theme_minimal()
+  theme_minimal() +
+  labs(
+    title = "Distribution of age",
+    x = "Age",
+    y = "Frequency"
+  )
 ```
 
 The histogram shows the age distribution of patients. Most patients are aged between 40 and 70 years. The data is well spread across middle and older age groups, making it possible for age-related analysis. Therefore, age will likely be a significant predictor for later analysis.
+
+## Distribution of tumor size
 
 ```{r}
 ggplot(survival_df, aes(x = tumor_size)) +
@@ -96,6 +105,8 @@ ggplot(survival_df, aes(x = tumor_size)) +
 
 This is the distribution of all tumor sizes, and most of the tumor sizes are smaller than 50 mm. We can find that the most frequent size is around 19 mm, followed by around 14 mm.
 
+## Distribution of examined regional node
+
 ```{r}
 ggplot(survival_df, aes(x = regional_node_examined)) +
   geom_histogram(fill = "light blue", color = "black") +
@@ -108,6 +119,8 @@ ggplot(survival_df, aes(x = regional_node_examined)) +
 ```
 
 This plot maps the frequency of different number of examined regional nodes for each subject. The number of examined regional nodes for most subjects are smaller than 30, and the subjects with nearly 12 examined regional nodes are the most.
+
+## Distribution of positive regional node
 
 ```{r}
 ggplot(survival_df, aes(x = reginol_node_positive)) +
@@ -122,15 +135,19 @@ ggplot(survival_df, aes(x = reginol_node_positive)) +
 
 Then is the distribution of different number of positive reginol node for each subject. Over 2500 subjects only have 1 or 2 positive reginol nodes, which is the most frequent number of positive reginol nodes.
 
+## Distribution of survival months
+
 ```{r}
 ggplot(survival_df, aes(x = survival_months)) +
   geom_histogram(fill = "light blue", color = "black") +
-  labs(title = "Distribution of Survival Months", x = "Survival Months", y = "Density")
+  labs(title = "Distribution of Survival Months", x = "Survival Months", y = "Frequency")
 ```
 
 
 
-## test the relationship between these variables 
+# test the relationship between these variables 
+
+## Distribution of age by survival status
 
 ```{r}
 ggplot(survival_df, aes(x = status, y = age)) +
@@ -138,10 +155,6 @@ ggplot(survival_df, aes(x = status, y = age)) +
   labs(title = "Age by Survival Status", x = "Survival Status", y = "Age")
 ```
 
-
-```{r}
-
-```
 
 
 
@@ -154,7 +167,7 @@ survival_df |>
 
 The majority of patients in the dataset are White, accounting for approximately 84.82% of the total population. Black patients make up 7.23%, and patients classified as "Other" constitute 7.95%. This imbalance suggests that the dataset is heavily skewed towards White patients, which could influence the generalizability of the findings to other racial groups. 
 
-#### The distribution of the tumor sizes by t_stage
+## The distribution of the tumor sizes by t_stage
 
 ```{r}
 ggplot(survival_df, aes(x = tumor_size, y = t_stage)) +
@@ -169,7 +182,7 @@ ggplot(survival_df, aes(x = tumor_size, y = t_stage)) +
 
 In this plot, we explore the tumor size distribution at different T stages. From T1 to T3, as the stage changes, both the mean tumor sizes and IQR become larger. At T4 stage, the IQR of tumor sizes is much larger than others, and the mean size is smaller than the mean size at T3 stage. There are some outliers both ar T1 stage and T3 stage.
 
-#### The distribution of survival months by a_stage
+## The distribution of survival months by a_stage based on status(alive/dead)
 
 ```{r}
 ggplot(survival_df, aes(x = survival_months, y = a_stage)) +
@@ -179,11 +192,37 @@ ggplot(survival_df, aes(x = survival_months, y = a_stage)) +
     title = "Distribution of Survival Months by A_stage",
     x = "Survival Months",
     y = "A_stage"
-  )
+  ) +
+  facet_grid(~ status)
 ```
 
 Through this plot, we can find that subjects with Distant stage have fewer survival months than subjects with Regional stage. However, the IQR of the survival months of subjects with Distant stage is much larger than subjects with Regional stage.
 
+## Distribution of Estrogen Status by Tumor Size Based on race
+
+```{r}
+ggplot(survival_df, aes(x = progesterone_status, y = tumor_size)) +
+  geom_boxplot(fill = "light blue") +
+  labs(
+    title = "Distribution of Estrogen Status by Tumor Size",
+    x = "Estrogen Status",
+    y = "Tumor Size"
+  ) +
+  facet_grid(~ race)
+```
+
+
+
+```{r}
+ggplot(survival_df, aes(x = age, y = reginol_node_positive)) +
+  geom_boxplot(fill = "light blue") +
+  labs(
+    title = "Distribution of by ",
+    x = "",
+    y = ""
+  ) +
+  facet_grid(~ grade)
+```
 
 
 
