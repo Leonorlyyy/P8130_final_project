@@ -135,12 +135,25 @@ ggplot(survival_df, aes(x = reginol_node_positive)) +
 
 Then is the distribution of different number of positive reginol node for each subject. Over 2500 subjects only have 1 or 2 positive reginol nodes, which is the most frequent number of positive reginol nodes.
 
-## Distribution of survival months
+## Distribution of Cancer Grades
 
 ```{r}
-ggplot(survival_df, aes(x = survival_months)) +
-  geom_histogram(fill = "light blue", color = "black") +
-  labs(title = "Distribution of Survival Months", x = "Survival Months", y = "Frequency")
+ggplot(survival_df, aes(x = grade)) +
+    geom_bar(fill = "skyblue") +
+    labs(title = "Frequency Distribution of Cancer Grades",
+         x = "Grade",
+         y = "Count") +
+    theme_minimal()
+```
+
+
+## Distribution of survival months by status
+
+```{r}
+ggplot(survival_df, aes(x = survival_months, fill = status)) +
+  geom_histogram(binwidth = 5, position = "dodge") +
+  labs(title = "Distribution of Survival Months", x = "Survival Months", y = "Frequency") +
+  theme_minimal()
 ```
 
 
@@ -211,20 +224,78 @@ ggplot(survival_df, aes(x = progesterone_status, y = tumor_size)) +
   facet_grid(~ race)
 ```
 
-
+## Tumor Size Distribution by Grade
 
 ```{r}
-ggplot(survival_df, aes(x = age, y = reginol_node_positive)) +
-  geom_boxplot(fill = "light blue") +
-  labs(
-    title = "Distribution of by ",
-    x = "",
-    y = ""
-  ) +
-  facet_grid(~ grade)
+ggplot(survival_df, aes(x = grade, y = tumor_size)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "Tumor Size Distribution by Grade",
+       x = "Grade",
+       y = "Tumor Size (mm)") +
+  theme_minimal()
 ```
 
+## Proportion of Grade by Estrogen Status
 
+```{r}
+ggplot(survival_df, aes(x = grade, fill = estrogen_status)) +
+    geom_bar(position = "fill") +
+    labs(title = "Proportion of Grade by Estrogen Status",
+         x = "Grade",
+         y = "Proportion",
+         fill = "Race") +
+    theme_minimal()
+```
+
+## Proportion of Grade by Marital Status
+
+```{r}
+ggplot(survival_df, aes(x = grade, fill = marital_status)) +
+    geom_bar(position = "fill") +
+    labs(title = "Proportion of Grade by Marital Status",
+         x = "Grade",
+         y = "Proportion",
+         fill = "Race") +
+    theme_minimal()
+```
+
+## Relationship Between Age and Tumor Size across status
+
+```{r}
+ggplot(survival_df, aes(x = age, y = tumor_size, color = status)) +
+    geom_point() +
+  geom_smooth(method = "lm") +
+  facet_wrap(~ status) +
+    labs(title = "Relationship Between Age and Tumor Size",
+         x = "Age (years)",
+         y = "Tumor Size (mm)",
+         color = "Status") +
+    theme_minimal()
+
+```
+
+## Age vs. Tumor Size Across Grades
+
+```{r}
+ggplot(survival_df, aes(x = age, y = tumor_size)) +
+    geom_point(color = "lightblue") +
+  geom_smooth(method = "lm") +
+    facet_wrap(~ marital_status) +
+    labs(title = "Age vs. Tumor Size Across Grades",
+         x = "Age (years)",
+         y = "Tumor Size (mm)") +
+    theme_minimal()
+```
+
+Divorced: Tumor size seems to remain fairly constant with age, as the trend line is relatively flat.
+
+Married: A slight negative trend is observable, suggesting that tumor size may decrease marginally with age.
+
+Separated: The data is sparse, but the trend shows a slightly negative relationship, with wide confidence intervals due to fewer observations.
+
+Single: A modest negative trend is observed, indicating a potential decline in tumor size with increasing age.
+
+Widowed: A more apparent negative trend is evident compared to other groups, suggesting a stronger decrease in tumor size with age.
 
 
 
