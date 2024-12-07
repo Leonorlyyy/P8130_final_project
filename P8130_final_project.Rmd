@@ -146,6 +146,7 @@ ggplot(survival_df, aes(x = grade)) +
     theme_minimal()
 ```
 
+This bar chart provides an overview of how cancer cases are distributed across grades. Grade 2 represents the majority of cases, suggesting it is the most frequently observed grade, while Grade IV is exceedingly rare.
 
 ## Distribution of survival months by status
 
@@ -156,7 +157,7 @@ ggplot(survival_df, aes(x = survival_months, fill = status)) +
   theme_minimal()
 ```
 
-
+The Dead group is concentrated in the shorter survival months, while the Alive group is predominant in longer survival months, particularly beyond 60 months. 
 
 # test the relationship between these variables 
 
@@ -224,6 +225,8 @@ ggplot(survival_df, aes(x = progesterone_status, y = tumor_size)) +
   facet_grid(~ race)
 ```
 
+While the overall patterns are consistent, with Negative estrogen status generally associated with slightly larger tumor sizes, the variability and prevalence of outliers differ between groups. The White group shows the greatest spread in tumor size, while the Other group displays the least variability.
+
 ## Tumor Size Distribution by Grade
 
 ```{r}
@@ -234,6 +237,10 @@ ggplot(survival_df, aes(x = grade, y = tumor_size)) +
        y = "Tumor Size (mm)") +
   theme_minimal()
 ```
+
+Lower grades (1–3) exhibit comparable tumor size distributions, with slight increases in variability as the grade increases.
+
+Grade IV stands out due to its higher median and broader range, suggesting that more aggressive tumor grades are associated with larger tumor sizes.
 
 ## Proportion of Grade by Estrogen Status
 
@@ -247,6 +254,9 @@ ggplot(survival_df, aes(x = grade, fill = estrogen_status)) +
     theme_minimal()
 ```
 
+As tumor grade increases, the proportion of Negative estrogen status gradually increases, becoming more prominent in the anaplastic Grade IV category.
+Conversely, the dominance of the Positive estrogen status decreases with higher tumor grades.
+
 ## Proportion of Grade by Marital Status
 
 ```{r}
@@ -258,6 +268,12 @@ ggplot(survival_df, aes(x = grade, fill = marital_status)) +
          fill = "Race") +
     theme_minimal()
 ```
+
+Across all grades, the "Married" group consistently constitutes the largest proportion of individuals, dominating every tumor grade category.
+
+The "Single" group is the second-largest proportion in most grades, particularly Grades 2 and 3.
+
+The "Widowed" group and "Divorced" group make up smaller proportions across all tumor grades.
 
 ## Relationship Between Age and Tumor Size across status
 
