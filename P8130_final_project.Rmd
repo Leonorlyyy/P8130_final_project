@@ -371,5 +371,107 @@ survival_df = survival_df |>
 
 Since variables `tumor_size` and `reginol_node_positive` are skewed to the right, we need to use the log transformation and add new variables `log_tumor_size` and `log_reginol_node_positive` for further analysis.
 
+```{r}
+survival_df |> 
+  pivot_longer(
+    cols = c(age, tumor_size, regional_node_examined, reginol_node_positive, survival_months),
+    names_to = "variable",
+    values_to = "value"
+  ) |>
+  ggplot(aes(x = value)) +
+  geom_histogram() +
+  facet_wrap(variable ~ .,  scales = "free")
+```
+
+## Model Building
+
+### Logistic Regression Model
+
+```{r}
+full_glm = glm(status ~ age + race + marital_status + t_stage + n_stage + x6th_stage + differentiate + grade + a_stage + tumor_size + estrogen_status + progesterone_status + regional_node_examined + reginol_node_positive, data = survival_df, family = binomial)
+
+step(full_glm)
+
+automated_glm = glm(formula = status ~ age + race + marital_status + t_stage + n_stage + differentiate + estrogen_status + progesterone_status + regional_node_examined + reginol_node_positive, family = binomial, data = survival_df)
+
+summary(automated_glm)
+
+gvif_values <- vif(automated_glm)
+# Define degrees of freedom for each categorical variable
+calculate_df = function(variable) {
+  if (is.numeric(variable)) {
+    # Continuous variables have df = 1
+    return(1)
+  } else if (is.factor(variable)) {
+    # Categorical variables have df = levels - 1
+    return(length(levels(variable)) - 1)
+  } else {
+    return(NA)  # For unsupported types
+  }
+}
+
+df_results <- data.frame(sapply(survival_df, calculate_df))
+
+adjusted_gvif_list = gvif_values 
+
+categorical_predictors <- c("race", "marital_status", "t_stage", "n_stage", "differentiate")
+
+sum_vif <- sapply(categorical_predictors, function(predictor) {
+  # Find all variables related to this predictor
+  relevant_vars <- grep(predictor, names(gvif_values), value = TRUE)
+  
+  # Sum the VIF values for these variables
+  sum(gvif_values[relevant_vars])
+})
+
+continuous_vif <- gvif_values[setdiff(names(gvif_values), unlist(lapply(categorical_predictors, function(x) grep(x, names(gvif_values), value = TRUE))))]
+
+vif_summary <- data.frame(
+  Variable = c(names(sum_vif), names(continuous_vif)),
+  Total_VIF = c(sum_vif, continuous_vif)
+) 
+vif_summary$Variable[vif_summary$Variable == "estrogen_statusPositive"] <- "estrogen_status"
+vif_summary$Variable[vif_summary$Variable == "progesterone_statusPositive"] <- "progesterone_status"
+
+df_results <- data.frame(
+  Variable = rownames(df_results),
+  DF = df_results[, 1],  # Assuming the second column contains degrees of freedom
+  row.names = NULL
+)
+
+adjusted_vif_df <- merge(vif_summary, df_results, by = "Variable", all.x = TRUE) |>
+  mutate(
+    adjused_vif = Total_VIF^(1/(2*DF))
+  )
+
+adjusted_vif_df
+```
+
+Adjusted R^2 increases as predictor number increases, but need to simplify the model. 
+
+```{r}
+subsets = regsubsets(status ~ age + race + marital_status + t_stage + n_stage + x6th_stage + differentiate + grade + a_stage + tumor_size + estrogen_status + progesterone_status + regional_node_examined + reginol_node_positive, data = survival_df, nbest = 1)
+subset_summary = summary(subsets)
+
+plot(subset_summary$adjr2, type = "b", 
+     xlab = "Number of Predictors", ylab = "Adjusted R^2", 
+     main = "Distribution of Adjusted R^2 of Different Models")
+```
+
+## Likelihood ratio test
+
+Test the validity of the automated logistic regression model
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
 
 
