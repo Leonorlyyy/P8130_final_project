@@ -344,7 +344,7 @@ Widowed: A more apparent negative trend is evident compared to other groups, sug
 
 ```{r}
 ggplot(survival_df, aes(x = reginol_node_positive, y = survival_months)) +
-  geom_point(color = "light blue", size = 0.8, alpha = 0.5)  +
+  geom_point(color = "light blue", size = 0.5, alpha = 0.5)  +
   facet_wrap(.~grade) +
   geom_smooth(method = "lm") +
   labs(
