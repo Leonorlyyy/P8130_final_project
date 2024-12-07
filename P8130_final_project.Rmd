@@ -8,6 +8,7 @@ editor_options:
 ---
 
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 library(tidyverse)
 library(ggplot2)
 library(dplyr)
@@ -61,6 +62,10 @@ survival_df = survival_df |>
 summary(survival_df)
 ```
 
+
+The majority of patients in the dataset are White, accounting for approximately 84.82% of the total population. Black patients make up 7.23%, and patients classified as "Other" constitute 7.95%. This imbalance suggests that the dataset is heavily skewed towards White patients, which could influence the generalizability of the findings to other racial groups. 
+
+
 The wide range of values in variables such as `tumor_size`, `regional_node_examined`, and `survival_months` indicates the need to explore relationships and their potential nonlinearities with survival, giving us a possible analytical regression model.
 
 
@@ -70,9 +75,39 @@ colSums(is.na(survival_df))
 
 We can conclude that no missing values are present in this dataset across all variables.
 
+
+```{r}
+survival_df |>
+  group_by(differentiate, race) |>
+  summarise(count = n(), .groups = "drop") |>
+  pivot_wider(
+    names_from = differentiate,
+    values_from = count,
+    values_fill = list(count = 0)
+  )
+```
+
+This table shows the frequency of different levels of `differentiate` by races.
+
+
+
+
+```{r}
+survival_df |>
+  group_by(x6th_stage, status) |>
+  summarise(count = n(), .groups = "drop") |>
+  pivot_wider(
+    names_from = status,
+    values_from = count
+  )
+```
+
+This table shows the frequency of different levels of `status` by 6th stage.
+
+
 - Data Visualization
 
-# Some distributions of the variables in this data
+# Distributions of the numeric variables
 
 ## Distribution of age
 
@@ -103,7 +138,7 @@ ggplot(survival_df, aes(x = tumor_size)) +
   )
 ```
 
-This is the distribution of all tumor sizes, and most of the tumor sizes are smaller than 50 mm. We can find that the most frequent size is around 19 mm, followed by around 14 mm.
+This is the distribution of all tumor sizes, and most of the tumor sizes are smaller than 50 mm. We can find that the most frequent size is around 19 mm, followed by around 14 mm. This distribution is right-skewed, so we will use the log transformation for this variable.
 
 ## Distribution of examined regional node
 
@@ -133,7 +168,7 @@ ggplot(survival_df, aes(x = reginol_node_positive)) +
   )
 ```
 
-Then is the distribution of different number of positive reginol node for each subject. Over 2500 subjects only have 1 or 2 positive reginol nodes, which is the most frequent number of positive reginol nodes.
+Then is the distribution of different number of positive reginol node for each subject. Over 2500 subjects only have 1 or 2 positive reginol nodes, which is the most frequent number of positive reginol nodes. It is strongly right-skewed, so we will use the log transformation for this variable.
 
 ## Distribution of Cancer Grades
 
@@ -148,6 +183,12 @@ ggplot(survival_df, aes(x = grade)) +
 
 This bar chart provides an overview of how cancer cases are distributed across grades. Grade 2 represents the majority of cases, suggesting it is the most frequently observed grade, while Grade IV is exceedingly rare.
 
+
+
+
+# Bewteen Variables 
+
+
 ## Distribution of survival months by status
 
 ```{r}
@@ -159,27 +200,9 @@ ggplot(survival_df, aes(x = survival_months, fill = status)) +
 
 The Dead group is concentrated in the shorter survival months, while the Alive group is predominant in longer survival months, particularly beyond 60 months. 
 
-# test the relationship between these variables 
-
-## Distribution of age by survival status
-
-```{r}
-ggplot(survival_df, aes(x = status, y = age)) +
-  geom_boxplot(fill = "light blue") +
-  labs(title = "Age by Survival Status", x = "Survival Status", y = "Age")
-```
 
 
 
-
-```{r}
-survival_df |> 
-  group_by(race) |> 
-  summarize(Count = n(), Proportion = n() / nrow(survival_df)) |> 
-  knitr::kable()
-```
-
-The majority of patients in the dataset are White, accounting for approximately 84.82% of the total population. Black patients make up 7.23%, and patients classified as "Other" constitute 7.95%. This imbalance suggests that the dataset is heavily skewed towards White patients, which could influence the generalizability of the findings to other racial groups. 
 
 ## The distribution of the tumor sizes by t_stage
 
@@ -316,6 +339,37 @@ Single: A modest negative trend is observed, indicating a potential decline in t
 Widowed: A more apparent negative trend is evident compared to other groups, suggesting a stronger decrease in tumor size with age.
 
 
+## Positive Reginol Node vs Survival Months Across Cancer Grade
+
+
+```{r}
+ggplot(survival_df, aes(x = reginol_node_positive, y = survival_months)) +
+  geom_point(color = "light blue", size = 0.8, alpha = 0.8)  +
+  facet_wrap(.~grade) +
+  geom_smooth(method = "lm") +
+  labs(
+    title = "Distribution of Positive Reginol Node and Survival Months by Cancer Grade",
+    x = "Positive Reginol Node",
+    y = "Survival Months"
+  ) +
+  theme_minimal()
+```
+
+According to the trend lines, as the cancer grade increases, the negative correlation between the number of positive reginol nodes and the survival months becomes stronger. At the Grade IV, the correlation is strong. AS the number of positive reginol nodes increases, the survival months will decrease. 
+
+
+# Transformations
+
+```{r}
+survival_df = survival_df |>
+  mutate(
+    log_tumor_size = log(tumor_size),
+    log_reginol_node_positive = log(reginol_node_positive)
+  )
+```
+
+
+Since variables `tumor_size` and `reginol_node_positive` are skewed to the right, we need to use the log transformation and add new variables `log_tumor_size` and `log_reginol_node_positive` for further analysis.
 
 
 
