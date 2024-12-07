@@ -274,6 +274,8 @@ ggplot(survival_df, aes(x = age, y = tumor_size, color = status)) +
 
 ```
 
+This figure highlights the differences in tumor size distribution and trends with age between individuals who are alive and those who are deceased. While the "Alive" group shows no significant relationship between age and tumor size, the "Dead" group exhibits a pattern where larger tumors are associated with younger ages. 
+
 ## Age vs. Tumor Size Across Grades
 
 ```{r}
