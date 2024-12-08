@@ -13,6 +13,14 @@ library(tidyverse)
 library(ggplot2)
 library(dplyr)
 library(car)
+library(leaps)
+library(lmtest)
+library(regressinator)
+library(broom)
+library(modelr)
+library(survival)
+library(survminer)
+set.seed(11)
 ```
 
 # Appendix
@@ -383,69 +391,9 @@ survival_df |>
   facet_wrap(variable ~ .,  scales = "free")
 ```
 
-## Model Building
+# Model Building
 
-### Logistic Regression Model
-
-```{r}
-full_glm = glm(status ~ age + race + marital_status + t_stage + n_stage + x6th_stage + differentiate + grade + a_stage + tumor_size + estrogen_status + progesterone_status + regional_node_examined + reginol_node_positive, data = survival_df, family = binomial)
-
-step(full_glm)
-
-automated_glm = glm(formula = status ~ age + race + marital_status + t_stage + n_stage + differentiate + estrogen_status + progesterone_status + regional_node_examined + reginol_node_positive, family = binomial, data = survival_df)
-
-summary(automated_glm)
-
-gvif_values <- vif(automated_glm)
-# Define degrees of freedom for each categorical variable
-calculate_df = function(variable) {
-  if (is.numeric(variable)) {
-    # Continuous variables have df = 1
-    return(1)
-  } else if (is.factor(variable)) {
-    # Categorical variables have df = levels - 1
-    return(length(levels(variable)) - 1)
-  } else {
-    return(NA)  # For unsupported types
-  }
-}
-
-df_results <- data.frame(sapply(survival_df, calculate_df))
-
-adjusted_gvif_list = gvif_values 
-
-categorical_predictors <- c("race", "marital_status", "t_stage", "n_stage", "differentiate")
-
-sum_vif <- sapply(categorical_predictors, function(predictor) {
-  # Find all variables related to this predictor
-  relevant_vars <- grep(predictor, names(gvif_values), value = TRUE)
-  
-  # Sum the VIF values for these variables
-  sum(gvif_values[relevant_vars])
-})
-
-continuous_vif <- gvif_values[setdiff(names(gvif_values), unlist(lapply(categorical_predictors, function(x) grep(x, names(gvif_values), value = TRUE))))]
-
-vif_summary <- data.frame(
-  Variable = c(names(sum_vif), names(continuous_vif)),
-  Total_VIF = c(sum_vif, continuous_vif)
-) 
-vif_summary$Variable[vif_summary$Variable == "estrogen_statusPositive"] <- "estrogen_status"
-vif_summary$Variable[vif_summary$Variable == "progesterone_statusPositive"] <- "progesterone_status"
-
-df_results <- data.frame(
-  Variable = rownames(df_results),
-  DF = df_results[, 1],  # Assuming the second column contains degrees of freedom
-  row.names = NULL
-)
-
-adjusted_vif_df <- merge(vif_summary, df_results, by = "Variable", all.x = TRUE) |>
-  mutate(
-    adjused_vif = Total_VIF^(1/(2*DF))
-  )
-
-adjusted_vif_df
-```
+## Logistic Regression Model
 
 Adjusted R^2 increases as predictor number increases, but need to simplify the model. 
 
@@ -458,17 +406,124 @@ plot(subset_summary$adjr2, type = "b",
      main = "Distribution of Adjusted R^2 of Different Models")
 ```
 
-## Likelihood ratio test
+Automated procedure
+
+```{r}
+full_glm = glm(status ~ age + race + marital_status + t_stage + n_stage + x6th_stage + differentiate + grade + a_stage + tumor_size + estrogen_status + progesterone_status + regional_node_examined + reginol_node_positive, data = survival_df, family = binomial)
+
+step(full_glm)
+
+automated_glm = glm(formula = status ~ age + race + marital_status + t_stage + n_stage + differentiate + estrogen_status + progesterone_status + regional_node_examined + reginol_node_positive, family = binomial, data = survival_df)
+
+summary(automated_glm)
+
+vif(automated_glm)
+```
+
+### Model Diagnostics
+
+```{r}
+augment(automated_glm) |>
+  ggplot(aes(x = .fitted, y = .std.resid)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  labs(x = "Fitted value", y = "Residual")
+
+augment_quantile(automated_glm) |>
+  ggplot(aes(x = .fitted, y = .quantile.resid)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  labs(x = "Fitted value", y = "Randomized quantile residual")
+```
+
+By randomizing the quantile residuals, we resolve the problem that the RVF plot always shows a pattern in logistic regression because of the binary response variable. Since in the randomized quantile residual vs. fitted value plot, the residuals distribute randomly around the 0.5 horizontal line, the residual assumption is met and the model is a good fit.
+
+```{r}
+plot(automated_glm, which = 5)
+```
+
+The residual vs. leverage plot indicates that observations 3527, 1561, and 3074 may be potential outliers, but they are not necessarily influential. 
+
+### Likelihood ratio test
 
 Test the validity of the automated logistic regression model
 
 ```{r}
+lrtest(automated_glm, full_glm)
 
+final_glm = automated_glm
 ```
 
+According to the likelihood ratio test, he full model is not significantly more effective in predicting survival status than the automated model, so we will use the automated model as the final logistic model. 
 
+### Odds Ratios
 
+```{r}
+final_glm_summary = summary(final_glm)
 
+final_glm_df = as.data.frame(final_glm_summary$coefficients) |>
+  janitor::clean_names() |>
+  mutate(
+    odds_ratio = exp(estimate)
+  ) |>
+  rename(p_value = pr_z)
+
+final_glm_df
+```
+
+### Cross Validation
+
+```{r}
+log_loss = function(actual, predicted) {
+  -mean(actual * log(predicted) + (1 - actual) * log(1 - predicted))
+}
+
+survival_df = survival_df |>
+   mutate(status = if_else(status == "dead", 0, 1))
+
+cv_df = 
+  crossv_kfold(survival_df, k = 5) |>
+  mutate(
+    train = map(train, as_tibble),
+    test = map(test, as_tibble)
+  )
+
+cv_res_df = 
+  cv_df |>
+  mutate(
+    final_model = map(train, \(x) glm(formula = status ~ age + race + marital_status + t_stage + n_stage + differentiate + estrogen_status + progesterone_status + regional_node_examined + reginol_node_positive, family = binomial, data = survival_df)),
+    log_loss = map2_dbl(final_model, test, \(model, test_data) {
+      predicted_probs = predict(model, newdata = test_data, type = "response")
+      actual_outcomes = test_data$status
+      log_loss(actual_outcomes, predicted_probs)
+    })
+  )
+
+CV_log_loss = mean(cv_res_df$log_loss)
+CV_log_loss
+```
+
+Since the CV_log_loss is very small, the model is a good fit by cross validation. 
+
+- Evaluate the performance of your model(s). Is your model achieving similar performance
+between the majority race group “White” and the minority “Black” (or “Black” + “Other”)? If not, could you try to improve the fairness (i.e., reducing the gap of prediction performance between the majority and minority) of your model(s)?
+
+## Survival Analysis
+
+```{r}
+km_fit = survfit(Surv(survival_months, status) ~ 1, data = survival_df)
+ggsurvplot(km_fit, conf.int = TRUE, title = "Kaplan-Meier Survival Curve")
+
+# Fit a Cox Proportional Hazards Model
+cox_model <- coxph(Surv(survival_months, status) ~ age + race + marital_status + t_stage + n_stage + x6th_stage + differentiate + grade + a_stage + tumor_size + estrogen_status + progesterone_status + regional_node_examined + reginol_node_positive, data = survival_df)
+summary(cox_model)
+
+# Check proportional hazards assumption
+cox.zph(cox_model)
+
+# Visualize adjusted survival curves
+ggsurvplot(survfit(cox_model), data = survival_df, title = "Cox Model Survival Curve")
+```
 
 
 
