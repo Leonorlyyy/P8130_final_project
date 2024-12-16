@@ -218,17 +218,7 @@ This bar chart provides an overview of how cancer cases are distributed across g
 # Bewteen Variables 
 
 
-## Survival months by status (****)
-
-```{r}
-ggplot(survival_df, aes(x = survival_months, fill = status)) +
-  geom_histogram(binwidth = 5, position = "dodge") +
-  labs(title = "Distribution of Survival Months", x = "Survival Months", y = "Frequency") +
-  theme_minimal()
-```
-
-The Dead group is concentrated in the shorter survival months, while the Alive group is predominant in longer survival months, particularly beyond 60 months. 
-
+## Survival months by status
 
 ```{r}
 ggplot(survival_df, aes(x = status, y = survival_months)) + 
@@ -237,9 +227,10 @@ ggplot(survival_df, aes(x = status, y = survival_months)) +
   theme_minimal()
 ```
 
+The Alive group has a higher median survival time (approximately 75 months) with a relatively narrow interquartile range. However, there are several outliers below 15 survival months, indicating cases of unusually short survival. In contrast, the Dead group has a lower median survival time (around 45 months) with a wider interquartile range, reflecting greater variability. Overall, survival months are significantly higher for the Alive group compared to the Dead group.
 
 
-## Tumor sizes by t_stage (****)
+## Tumor sizes by t_stage
 
 ```{r}
 ggplot(survival_df, aes(x = tumor_size, y = t_stage)) +
@@ -252,12 +243,12 @@ ggplot(survival_df, aes(x = tumor_size, y = t_stage)) +
   )
 ```
 
-In this plot, we explore the tumor size distribution at different T stages. From T1 to T3, as the stage changes, both the mean tumor sizes and IQR become larger. At T4 stage, the IQR of tumor sizes is much larger than others, and the mean size is smaller than the mean size at T3 stage. There are some outliers both ar T1 stage and T3 stage.
+In this plot, we explore the tumor size distribution at different T stages. From T1 to T3, as the stage changes, both the mean tumor sizes and IQR become larger. At T4 stage, the IQR of tumor sizes is much larger than others, and the mean size is smaller than the mean size at T3 stage. We notice that there are some outliers both ar T1 stage and T3 stage.
 
 
 
 
-## Survival months by a_stage based on status(alive/dead) (****)
+## Survival months by a_stage based on status(alive/dead)
 
 ```{r}
 ggplot(survival_df, aes(x = survival_months, y = a_stage)) +
@@ -271,12 +262,11 @@ ggplot(survival_df, aes(x = survival_months, y = a_stage)) +
   facet_grid(~ status)
 ```
 
-Through this plot, we can find that subjects with Distant stage have fewer survival months than subjects with Regional stage. However, the IQR of the survival months of subjects with Distant stage is much larger than subjects with Regional stage.
+In the Regional stage, the Alive group has a higher median survival with outliers below 15 months, while the Dead group shows a lower median with no outliers. For the Distant stage, survival times are shorter overall, with the Alive group having a median of 80 months and the Dead group around 30 months, both without significant outliers. Overall, survival is longer in the Regional stage, and the Alive group shows higher survival times across both stages.
 
 
 
-
-## Tumor Size by Differentiate (****)
+## Tumor Size by Differentiate
 
 ```{r}
 ggplot(survival_df, aes(x = differentiate, y = tumor_size)) +
@@ -292,7 +282,7 @@ Lower grades (1–3) exhibit comparable tumor size distributions, with slight in
 
 Grade IV stands out due to its higher median and broader range, suggesting that more aggressive tumor grades are associated with larger tumor sizes.
 
-
+The Undifferentiated group has larger and more variable tumor sizes compared to the other categories, while the Well, Moderately, and Poorly differentiated groups show similar distributions with many smaller tumors and numerous high-value outliers.
 
 
 ## Relationship Between Age and Tumor Size across Status
