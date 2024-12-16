@@ -91,6 +91,8 @@ survival_df = survival_df |>
 summary(survival_df)
 ```
 
+## Descriptive table for numerical variables
+
 ```{r}
 summary_table = survival_df |> 
   summarise(
