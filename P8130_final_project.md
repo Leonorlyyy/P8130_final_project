@@ -93,37 +93,29 @@ survival_df = survival_df |>
 ```
 
 ``` r
-summary(survival_df)
+summary_tbl =
+  summary(survival_df) |>
+  as.data.frame() |>          
+  rownames_to_column(var = "Variable") |>  
+  as_tibble()
+
+print(summary_tbl)
 ```
 
-    ##       age           race        marital_status t_stage   n_stage   x6th_stage 
-    ##  Min.   :30.00   Black: 291   Divorced : 486   T1:1603   N1:2732   IIA :1305  
-    ##  1st Qu.:47.00   Other: 320   Married  :2643   T2:1786   N2: 820   IIB :1130  
-    ##  Median :54.00   White:3413   Separated:  45   T3: 533   N3: 472   IIIA:1050  
-    ##  Mean   :53.97                Single   : 615   T4: 102             IIIB:  67  
-    ##  3rd Qu.:61.00                Widowed  : 235                       IIIC: 472  
-    ##  Max.   :69.00                                                                
-    ##                    differentiate                   grade          a_stage    
-    ##  Well differentiated      : 543   1                   : 543   Distant :  92  
-    ##  Moderately differentiated:2351   2                   :2351   Regional:3932  
-    ##  Poorly differentiated    :1111   3                   :1111                  
-    ##  Undifferentiated         :  19   anaplastic; Grade IV:  19                  
-    ##                                                                              
-    ##                                                                              
-    ##    tumor_size     estrogen_status progesterone_status regional_node_examined
-    ##  Min.   :  1.00   Negative: 269   Negative: 698       Min.   : 1.00         
-    ##  1st Qu.: 16.00   Positive:3755   Positive:3326       1st Qu.: 9.00         
-    ##  Median : 25.00                                       Median :14.00         
-    ##  Mean   : 30.47                                       Mean   :14.36         
-    ##  3rd Qu.: 38.00                                       3rd Qu.:19.00         
-    ##  Max.   :140.00                                       Max.   :61.00         
-    ##  reginol_node_positive survival_months   status    
-    ##  Min.   : 1.000        Min.   :  1.0   Alive:3408  
-    ##  1st Qu.: 1.000        1st Qu.: 56.0   Dead : 616  
-    ##  Median : 2.000        Median : 73.0               
-    ##  Mean   : 4.158        Mean   : 71.3               
-    ##  3rd Qu.: 5.000        3rd Qu.: 90.0               
-    ##  Max.   :46.000        Max.   :107.0
+    ## # A tibble: 96 × 4
+    ##    Variable Var1  Var2       Freq             
+    ##    <chr>    <fct> <fct>      <chr>            
+    ##  1 1        ""    "     age" "Min.   :30.00  "
+    ##  2 2        ""    "     age" "1st Qu.:47.00  "
+    ##  3 3        ""    "     age" "Median :54.00  "
+    ##  4 4        ""    "     age" "Mean   :53.97  "
+    ##  5 5        ""    "     age" "3rd Qu.:61.00  "
+    ##  6 6        ""    "     age" "Max.   :69.00  "
+    ##  7 7        ""    "   race"  "Black: 291  "   
+    ##  8 8        ""    "   race"  "Other: 320  "   
+    ##  9 9        ""    "   race"  "White:3413  "   
+    ## 10 10       ""    "   race"   <NA>            
+    ## # ℹ 86 more rows
 
 The majority of patients in the dataset are White, accounting for
 approximately 84.82% of the total population. Black patients make up
@@ -136,6 +128,10 @@ The wide range of values in variables such as `tumor_size`,
 `regional_node_examined`, and `survival_months` indicates the need to
 explore relationships and their potential nonlinearities with survival,
 giving us a possible analytical regression model.
+
+Since the two variables `grade` and `differentiate` represent the same
+variable with different names, we will not consider the variable `grade`
+in the further analysis.
 
 ``` r
 colSums(is.na(survival_df))
@@ -289,7 +285,7 @@ nodes, which is the most frequent number of positive reginol nodes. It
 is strongly right-skewed, so we will use the log transformation for this
 variable.
 
-## Cancer Grades
+## Differentiates
 
 ``` r
 ggplot(survival_df, aes(x = grade)) +
@@ -312,17 +308,21 @@ rare.
 ## Survival months by status
 
 ``` r
-ggplot(survival_df, aes(x = survival_months, fill = status)) +
-  geom_histogram(binwidth = 5, position = "dodge") +
-  labs(title = "Distribution of Survival Months", x = "Survival Months", y = "Frequency") +
+ggplot(survival_df, aes(x = status, y = survival_months)) + 
+  geom_boxplot(fill = "light blue") +
+  labs(title = "Boxplot of Survival Months by Status", x = "Status", y = "Survival Months") +
   theme_minimal()
 ```
 
 <img src="P8130_final_project_files/figure-gfm/unnamed-chunk-13-1.png" width="90%" />
 
-The Dead group is concentrated in the shorter survival months, while the
-Alive group is predominant in longer survival months, particularly
-beyond 60 months.
+The Alive group has a higher median survival time (approximately 75
+months) with a relatively narrow interquartile range. However, there are
+several outliers below 15 survival months, indicating cases of unusually
+short survival. In contrast, the Dead group has a lower median survival
+time (around 45 months) with a wider interquartile range, reflecting
+greater variability. Overall, survival months are significantly higher
+for the Alive group compared to the Dead group.
 
 ## Tumor sizes by t_stage
 
@@ -343,7 +343,8 @@ In this plot, we explore the tumor size distribution at different T
 stages. From T1 to T3, as the stage changes, both the mean tumor sizes
 and IQR become larger. At T4 stage, the IQR of tumor sizes is much
 larger than others, and the mean size is smaller than the mean size at
-T3 stage. There are some outliers both ar T1 stage and T3 stage.
+T3 stage. We notice that there are some outliers both ar T1 stage and T3
+stage.
 
 ## Survival months by a_stage based on status(alive/dead)
 
@@ -361,44 +362,27 @@ ggplot(survival_df, aes(x = survival_months, y = a_stage)) +
 
 <img src="P8130_final_project_files/figure-gfm/unnamed-chunk-15-1.png" width="90%" />
 
-Through this plot, we can find that subjects with Distant stage have
-fewer survival months than subjects with Regional stage. However, the
-IQR of the survival months of subjects with Distant stage is much larger
-than subjects with Regional stage.
+In the Regional stage, the Alive group has a higher median survival with
+outliers below 15 months, while the Dead group shows a lower median with
+no outliers. For the Distant stage, survival times are shorter overall,
+with the Alive group having a median of 80 months and the Dead group
+around 30 months, both without significant outliers. Overall, survival
+is longer in the Regional stage, and the Alive group shows higher
+survival times across both stages.
 
-## Estrogen Status by Tumor Size Based on race
+## Tumor Size by Differentiate
 
 ``` r
-ggplot(survival_df, aes(x = progesterone_status, y = tumor_size)) +
-  geom_boxplot(fill = "light blue") +
-  labs(
-    title = "Distribution of Estrogen Status by Tumor Size",
-    x = "Estrogen Status",
-    y = "Tumor Size"
-  ) +
-  facet_grid(~ race)
+ggplot(survival_df, aes(x = differentiate, y = tumor_size)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "Tumor Size Distribution by Differentiate",
+       x = "Differentiate",
+       y = "Tumor Size (mm)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 <img src="P8130_final_project_files/figure-gfm/unnamed-chunk-16-1.png" width="90%" />
-
-While the overall patterns are consistent, with Negative estrogen status
-generally associated with slightly larger tumor sizes, the variability
-and prevalence of outliers differ between groups. The White group shows
-the greatest spread in tumor size, while the Other group displays the
-least variability.
-
-## Tumor Size by Grade
-
-``` r
-ggplot(survival_df, aes(x = grade, y = tumor_size)) +
-  geom_boxplot(fill = "lightblue") +
-  labs(title = "Tumor Size Distribution by Grade",
-       x = "Grade",
-       y = "Tumor Size (mm)") +
-  theme_minimal()
-```
-
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-17-1.png" width="90%" />
 
 Lower grades (1–3) exhibit comparable tumor size distributions, with
 slight increases in variability as the grade increases.
@@ -407,50 +391,12 @@ Grade IV stands out due to its higher median and broader range,
 suggesting that more aggressive tumor grades are associated with larger
 tumor sizes.
 
-## Proportion of Grade by Estrogen Status
+The Undifferentiated group has larger and more variable tumor sizes
+compared to the other categories, while the Well, Moderately, and Poorly
+differentiated groups show similar distributions with many smaller
+tumors and numerous high-value outliers.
 
-``` r
-ggplot(survival_df, aes(x = grade, fill = estrogen_status)) +
-    geom_bar(position = "fill") +
-    labs(title = "Proportion of Grade by Estrogen Status",
-         x = "Grade",
-         y = "Proportion",
-         fill = "Race") +
-    theme_minimal()
-```
-
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-18-1.png" width="90%" />
-
-As tumor grade increases, the proportion of Negative estrogen status
-gradually increases, becoming more prominent in the anaplastic Grade IV
-category. Conversely, the dominance of the Positive estrogen status
-decreases with higher tumor grades.
-
-## Proportion of Grade by Marital Status
-
-``` r
-ggplot(survival_df, aes(x = grade, fill = marital_status)) +
-    geom_bar(position = "fill") +
-    labs(title = "Proportion of Grade by Marital Status",
-         x = "Grade",
-         y = "Proportion",
-         fill = "Race") +
-    theme_minimal()
-```
-
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-19-1.png" width="90%" />
-
-Across all grades, the “Married” group consistently constitutes the
-largest proportion of individuals, dominating every tumor grade
-category.
-
-The “Single” group is the second-largest proportion in most grades,
-particularly Grades 2 and 3.
-
-The “Widowed” group and “Divorced” group make up smaller proportions
-across all tumor grades.
-
-## Relationship Between Age and Tumor Size across status
+## Relationship Between Age and Tumor Size across Status
 
 ``` r
 ggplot(survival_df, aes(x = age, y = tumor_size, color = status)) +
@@ -464,7 +410,7 @@ ggplot(survival_df, aes(x = age, y = tumor_size, color = status)) +
     theme_minimal()
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-20-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-17-1.png" width="90%" />
 
 This figure highlights the differences in tumor size distribution and
 trends with age between individuals who are alive and those who are
@@ -472,58 +418,28 @@ deceased. While the “Alive” group shows no significant relationship
 between age and tumor size, the “Dead” group exhibits a pattern where
 larger tumors are associated with younger ages.
 
-## Age vs. Tumor Size Across Grades
-
-``` r
-ggplot(survival_df, aes(x = age, y = tumor_size)) +
-    geom_point(color = "lightblue", size = 0.8, alpha = 0.5) +
-  geom_smooth(method = "lm") +
-    facet_wrap(~ marital_status) +
-    labs(title = "Age vs. Tumor Size Across Grades",
-         x = "Age (years)",
-         y = "Tumor Size (mm)") +
-    theme_minimal()
-```
-
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-21-1.png" width="90%" />
-
-Divorced: Tumor size seems to remain fairly constant with age, as the
-trend line is relatively flat.
-
-Married: A slight negative trend is observable, suggesting that tumor
-size may decrease marginally with age.
-
-Separated: The data is sparse, but the trend shows a slightly negative
-relationship, with wide confidence intervals due to fewer observations.
-
-Single: A modest negative trend is observed, indicating a potential
-decline in tumor size with increasing age.
-
-Widowed: A more apparent negative trend is evident compared to other
-groups, suggesting a stronger decrease in tumor size with age.
-
-## Positive Reginol Node vs Survival Months Across Cancer Grade
+## Positive Reginol Node vs Survival Months Across Differentiate
 
 ``` r
 ggplot(survival_df, aes(x = reginol_node_positive, y = survival_months)) +
   geom_point(color = "light blue", size = 0.5, alpha = 0.5)  +
-  facet_wrap(.~grade) +
+  facet_wrap(.~differentiate) +
   geom_smooth(method = "lm") +
   labs(
-    title = "Distribution of Positive Reginol Node and Survival Months by Cancer Grade",
+    title = "Distribution of Positive Reginol Node and Survival Months by Differentiate",
     x = "Positive Reginol Node",
     y = "Survival Months"
   ) +
   theme_minimal()
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-22-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-18-1.png" width="90%" />
 
-According to the trend lines, as the cancer grade increases, the
-negative correlation between the number of positive reginol nodes and
-the survival months becomes stronger. At the Grade IV, the correlation
-is strong. AS the number of positive reginol nodes increases, the
-survival months will decrease.
+According to the trend lines, as it changes from undifferentiated to
+well differentiated, the negative correlation between the number of
+positive reginol nodes and the survival months becomes weaker. At the
+undifferentiated level, the correlation is strong. AS the number of
+positive reginol nodes increases, the survival months will decrease.
 
 # Transformations
 
@@ -551,7 +467,7 @@ survival_df |>
   facet_wrap(variable ~ .,  scales = "free")
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-24-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-20-1.png" width="90%" />
 
 # Model Building
 
@@ -815,7 +731,7 @@ augment(final_glm) |>
   labs(x = "Fitted value", y = "Residual")
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-26-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-22-1.png" width="90%" />
 
 ``` r
 augment_quantile(final_glm) |>
@@ -825,7 +741,7 @@ augment_quantile(final_glm) |>
   labs(x = "Fitted value", y = "Randomized quantile residual")
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-26-2.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-22-2.png" width="90%" />
 
 By randomizing the quantile residuals, we resolve the problem that the
 RVF plot always shows a pattern in logistic regression because of the
@@ -838,7 +754,7 @@ fit.
 plot(final_glm, which = 5)
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-27-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-23-1.png" width="90%" />
 
 The residual vs. leverage plot indicates that observations 3527, 1561,
 and 3074 may be potential outliers, but they are not necessarily

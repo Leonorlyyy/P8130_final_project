@@ -20,6 +20,8 @@ library(modelr)
 library(pROC)
 library(rsample)
 library(survival)
+library(dplyr)
+library(tidyr)
 library(ggsurvfit)
 library(survminer)
 set.seed(11)
@@ -87,6 +89,54 @@ survival_df = survival_df |>
 
 ```{r}
 summary(survival_df)
+```
+
+```{r}
+summary_table = survival_df |> 
+  summarise(
+    age_Mean = mean(age, na.rm = TRUE),
+    age_SD = sd(age, na.rm = TRUE),
+    age_Median = median(age, na.rm = TRUE),
+    age_IQR = IQR(age, na.rm = TRUE),
+    
+    tumor_size_Mean = mean(tumor_size, na.rm = TRUE),
+    tumor_size_SD = sd(tumor_size, na.rm = TRUE),
+    tumor_size_Median = median(tumor_size, na.rm = TRUE),
+    tumor_size_IQR = IQR(tumor_size, na.rm = TRUE),
+    
+    regional_node_examined_Mean = mean(regional_node_examined, na.rm = TRUE),
+    regional_node_examined_SD = sd(regional_node_examined, na.rm = TRUE),
+    regional_node_examined_Median = median(regional_node_examined, na.rm = TRUE),
+    regional_node_examined_IQR = IQR(regional_node_examined, na.rm = TRUE),
+    
+    reginol_node_positive_Mean = mean(reginol_node_positive, na.rm = TRUE),
+    reginol_node_positive_SD = sd(reginol_node_positive, na.rm = TRUE),
+    reginol_node_positive_Median = median(reginol_node_positive, na.rm = TRUE),
+    reginol_node_positive_IQR = IQR(reginol_node_positive, na.rm = TRUE),
+    
+    survival_months_Mean = mean(survival_months, na.rm = TRUE),
+    survival_months_SD = sd(survival_months, na.rm = TRUE),
+    survival_months_Median = median(survival_months, na.rm = TRUE),
+    survival_months_IQR = IQR(survival_months, na.rm = TRUE)
+  )
+
+final_table = data.frame(
+  Variable = c("Age", "Tumor Size", "Regional Nodes Examined", "Regional Nodes Positive", "Survival Months"),
+  Mean = c(summary_table$age_Mean, summary_table$tumor_size_Mean, 
+           summary_table$regional_node_examined_Mean, summary_table$reginol_node_positive_Mean, 
+           summary_table$survival_months_Mean),
+  SD = c(summary_table$age_SD, summary_table$tumor_size_SD, 
+         summary_table$regional_node_examined_SD, summary_table$reginol_node_positive_SD, 
+         summary_table$survival_months_SD),
+  Median = c(summary_table$age_Median, summary_table$tumor_size_Median, 
+             summary_table$regional_node_examined_Median, summary_table$reginol_node_positive_Median, 
+             summary_table$survival_months_Median),
+  IQR = c(summary_table$age_IQR, summary_table$tumor_size_IQR, 
+          summary_table$regional_node_examined_IQR, summary_table$reginol_node_positive_IQR, 
+          summary_table$survival_months_IQR)
+)
+
+print(final_table)
 ```
 
 
