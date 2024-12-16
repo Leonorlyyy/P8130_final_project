@@ -199,7 +199,7 @@ ggplot(survival_df, aes(x = reginol_node_positive)) +
 
 Then is the distribution of different number of positive reginol node for each subject. Over 2500 subjects only have 1 or 2 positive reginol nodes, which is the most frequent number of positive reginol nodes. It is strongly right-skewed, so we will use the log transformation for this variable.
 
-## Cancer Grades
+## Differentiates
 
 ```{r}
 ggplot(survival_df, aes(x = grade)) +
@@ -218,7 +218,7 @@ This bar chart provides an overview of how cancer cases are distributed across g
 # Bewteen Variables 
 
 
-## Survival months by status
+## Survival months by status (****)
 
 ```{r}
 ggplot(survival_df, aes(x = survival_months, fill = status)) +
@@ -230,10 +230,16 @@ ggplot(survival_df, aes(x = survival_months, fill = status)) +
 The Dead group is concentrated in the shorter survival months, while the Alive group is predominant in longer survival months, particularly beyond 60 months. 
 
 
+```{r}
+ggplot(survival_df, aes(x = status, y = survival_months)) + 
+  geom_boxplot(fill = "light blue") +
+  labs(title = "Boxplot of Survival Months by Status", x = "Status", y = "Survival Months") +
+  theme_minimal()
+```
 
 
 
-## Tumor sizes by t_stage
+## Tumor sizes by t_stage (****)
 
 ```{r}
 ggplot(survival_df, aes(x = tumor_size, y = t_stage)) +
@@ -248,7 +254,10 @@ ggplot(survival_df, aes(x = tumor_size, y = t_stage)) +
 
 In this plot, we explore the tumor size distribution at different T stages. From T1 to T3, as the stage changes, both the mean tumor sizes and IQR become larger. At T4 stage, the IQR of tumor sizes is much larger than others, and the mean size is smaller than the mean size at T3 stage. There are some outliers both ar T1 stage and T3 stage.
 
-## Survival months by a_stage based on status(alive/dead)
+
+
+
+## Survival months by a_stage based on status(alive/dead) (****)
 
 ```{r}
 ggplot(survival_df, aes(x = survival_months, y = a_stage)) +
@@ -264,70 +273,29 @@ ggplot(survival_df, aes(x = survival_months, y = a_stage)) +
 
 Through this plot, we can find that subjects with Distant stage have fewer survival months than subjects with Regional stage. However, the IQR of the survival months of subjects with Distant stage is much larger than subjects with Regional stage.
 
-## Estrogen Status by Tumor Size Based on race
+
+
+
+## Tumor Size by Differentiate (****)
 
 ```{r}
-ggplot(survival_df, aes(x = progesterone_status, y = tumor_size)) +
-  geom_boxplot(fill = "light blue") +
-  labs(
-    title = "Distribution of Estrogen Status by Tumor Size",
-    x = "Estrogen Status",
-    y = "Tumor Size"
-  ) +
-  facet_grid(~ race)
-```
-
-While the overall patterns are consistent, with Negative estrogen status generally associated with slightly larger tumor sizes, the variability and prevalence of outliers differ between groups. The White group shows the greatest spread in tumor size, while the Other group displays the least variability.
-
-## Tumor Size by Grade
-
-```{r}
-ggplot(survival_df, aes(x = grade, y = tumor_size)) +
+ggplot(survival_df, aes(x = differentiate, y = tumor_size)) +
   geom_boxplot(fill = "lightblue") +
-  labs(title = "Tumor Size Distribution by Grade",
-       x = "Grade",
+  labs(title = "Tumor Size Distribution by Differentiate",
+       x = "Differentiate",
        y = "Tumor Size (mm)") +
-  theme_minimal()
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 Lower grades (1–3) exhibit comparable tumor size distributions, with slight increases in variability as the grade increases.
 
 Grade IV stands out due to its higher median and broader range, suggesting that more aggressive tumor grades are associated with larger tumor sizes.
 
-## Proportion of Grade by Estrogen Status
 
-```{r}
-ggplot(survival_df, aes(x = grade, fill = estrogen_status)) +
-    geom_bar(position = "fill") +
-    labs(title = "Proportion of Grade by Estrogen Status",
-         x = "Grade",
-         y = "Proportion",
-         fill = "Race") +
-    theme_minimal()
-```
 
-As tumor grade increases, the proportion of Negative estrogen status gradually increases, becoming more prominent in the anaplastic Grade IV category.
-Conversely, the dominance of the Positive estrogen status decreases with higher tumor grades.
 
-## Proportion of Grade by Marital Status
-
-```{r}
-ggplot(survival_df, aes(x = grade, fill = marital_status)) +
-    geom_bar(position = "fill") +
-    labs(title = "Proportion of Grade by Marital Status",
-         x = "Grade",
-         y = "Proportion",
-         fill = "Race") +
-    theme_minimal()
-```
-
-Across all grades, the "Married" group consistently constitutes the largest proportion of individuals, dominating every tumor grade category.
-
-The "Single" group is the second-largest proportion in most grades, particularly Grades 2 and 3.
-
-The "Widowed" group and "Divorced" group make up smaller proportions across all tumor grades.
-
-## Relationship Between Age and Tumor Size across status
+## Relationship Between Age and Tumor Size across Status
 
 ```{r}
 ggplot(survival_df, aes(x = age, y = tumor_size, color = status)) +
@@ -344,47 +312,25 @@ ggplot(survival_df, aes(x = age, y = tumor_size, color = status)) +
 
 This figure highlights the differences in tumor size distribution and trends with age between individuals who are alive and those who are deceased. While the "Alive" group shows no significant relationship between age and tumor size, the "Dead" group exhibits a pattern where larger tumors are associated with younger ages. 
 
-## Age vs. Tumor Size Across Grades
-
-```{r}
-ggplot(survival_df, aes(x = age, y = tumor_size)) +
-    geom_point(color = "lightblue", size = 0.8, alpha = 0.5) +
-  geom_smooth(method = "lm") +
-    facet_wrap(~ marital_status) +
-    labs(title = "Age vs. Tumor Size Across Grades",
-         x = "Age (years)",
-         y = "Tumor Size (mm)") +
-    theme_minimal()
-```
-
-Divorced: Tumor size seems to remain fairly constant with age, as the trend line is relatively flat.
-
-Married: A slight negative trend is observable, suggesting that tumor size may decrease marginally with age.
-
-Separated: The data is sparse, but the trend shows a slightly negative relationship, with wide confidence intervals due to fewer observations.
-
-Single: A modest negative trend is observed, indicating a potential decline in tumor size with increasing age.
-
-Widowed: A more apparent negative trend is evident compared to other groups, suggesting a stronger decrease in tumor size with age.
 
 
-## Positive Reginol Node vs Survival Months Across Cancer Grade
+## Positive Reginol Node vs Survival Months Across Differentiate
 
 
 ```{r}
 ggplot(survival_df, aes(x = reginol_node_positive, y = survival_months)) +
   geom_point(color = "light blue", size = 0.5, alpha = 0.5)  +
-  facet_wrap(.~grade) +
+  facet_wrap(.~differentiate) +
   geom_smooth(method = "lm") +
   labs(
-    title = "Distribution of Positive Reginol Node and Survival Months by Cancer Grade",
+    title = "Distribution of Positive Reginol Node and Survival Months by Differentiate",
     x = "Positive Reginol Node",
     y = "Survival Months"
   ) +
   theme_minimal()
 ```
 
-According to the trend lines, as the cancer grade increases, the negative correlation between the number of positive reginol nodes and the survival months becomes stronger. At the Grade IV, the correlation is strong. AS the number of positive reginol nodes increases, the survival months will decrease. 
+According to the trend lines, as it changes from undifferentiated to well differentiated, the negative correlation between the number of positive reginol nodes and the survival months becomes weaker. At the undifferentiated level, the correlation is strong. AS the number of positive reginol nodes increases, the survival months will decrease. 
 
 
 # Transformations
