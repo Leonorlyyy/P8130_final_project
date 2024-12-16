@@ -93,29 +93,94 @@ survival_df = survival_df |>
 ```
 
 ``` r
-summary_tbl =
-  summary(survival_df) |>
-  as.data.frame() |>          
-  rownames_to_column(var = "Variable") |>  
-  as_tibble()
-
-print(summary_tbl)
+summary(survival_df)
 ```
 
-    ## # A tibble: 96 × 4
-    ##    Variable Var1  Var2       Freq             
-    ##    <chr>    <fct> <fct>      <chr>            
-    ##  1 1        ""    "     age" "Min.   :30.00  "
-    ##  2 2        ""    "     age" "1st Qu.:47.00  "
-    ##  3 3        ""    "     age" "Median :54.00  "
-    ##  4 4        ""    "     age" "Mean   :53.97  "
-    ##  5 5        ""    "     age" "3rd Qu.:61.00  "
-    ##  6 6        ""    "     age" "Max.   :69.00  "
-    ##  7 7        ""    "   race"  "Black: 291  "   
-    ##  8 8        ""    "   race"  "Other: 320  "   
-    ##  9 9        ""    "   race"  "White:3413  "   
-    ## 10 10       ""    "   race"   <NA>            
-    ## # ℹ 86 more rows
+    ##       age           race        marital_status t_stage   n_stage   x6th_stage 
+    ##  Min.   :30.00   Black: 291   Divorced : 486   T1:1603   N1:2732   IIA :1305  
+    ##  1st Qu.:47.00   Other: 320   Married  :2643   T2:1786   N2: 820   IIB :1130  
+    ##  Median :54.00   White:3413   Separated:  45   T3: 533   N3: 472   IIIA:1050  
+    ##  Mean   :53.97                Single   : 615   T4: 102             IIIB:  67  
+    ##  3rd Qu.:61.00                Widowed  : 235                       IIIC: 472  
+    ##  Max.   :69.00                                                                
+    ##                    differentiate                   grade          a_stage    
+    ##  Well differentiated      : 543   1                   : 543   Distant :  92  
+    ##  Moderately differentiated:2351   2                   :2351   Regional:3932  
+    ##  Poorly differentiated    :1111   3                   :1111                  
+    ##  Undifferentiated         :  19   anaplastic; Grade IV:  19                  
+    ##                                                                              
+    ##                                                                              
+    ##    tumor_size     estrogen_status progesterone_status regional_node_examined
+    ##  Min.   :  1.00   Negative: 269   Negative: 698       Min.   : 1.00         
+    ##  1st Qu.: 16.00   Positive:3755   Positive:3326       1st Qu.: 9.00         
+    ##  Median : 25.00                                       Median :14.00         
+    ##  Mean   : 30.47                                       Mean   :14.36         
+    ##  3rd Qu.: 38.00                                       3rd Qu.:19.00         
+    ##  Max.   :140.00                                       Max.   :61.00         
+    ##  reginol_node_positive survival_months   status    
+    ##  Min.   : 1.000        Min.   :  1.0   Alive:3408  
+    ##  1st Qu.: 1.000        1st Qu.: 56.0   Dead : 616  
+    ##  Median : 2.000        Median : 73.0               
+    ##  Mean   : 4.158        Mean   : 71.3               
+    ##  3rd Qu.: 5.000        3rd Qu.: 90.0               
+    ##  Max.   :46.000        Max.   :107.0
+
+## Descriptive table for numerical variables
+
+``` r
+summary_table = survival_df |> 
+  summarise(
+    age_Mean = mean(age, na.rm = TRUE),
+    age_SD = sd(age, na.rm = TRUE),
+    age_Median = median(age, na.rm = TRUE),
+    age_IQR = IQR(age, na.rm = TRUE),
+    
+    tumor_size_Mean = mean(tumor_size, na.rm = TRUE),
+    tumor_size_SD = sd(tumor_size, na.rm = TRUE),
+    tumor_size_Median = median(tumor_size, na.rm = TRUE),
+    tumor_size_IQR = IQR(tumor_size, na.rm = TRUE),
+    
+    regional_node_examined_Mean = mean(regional_node_examined, na.rm = TRUE),
+    regional_node_examined_SD = sd(regional_node_examined, na.rm = TRUE),
+    regional_node_examined_Median = median(regional_node_examined, na.rm = TRUE),
+    regional_node_examined_IQR = IQR(regional_node_examined, na.rm = TRUE),
+    
+    reginol_node_positive_Mean = mean(reginol_node_positive, na.rm = TRUE),
+    reginol_node_positive_SD = sd(reginol_node_positive, na.rm = TRUE),
+    reginol_node_positive_Median = median(reginol_node_positive, na.rm = TRUE),
+    reginol_node_positive_IQR = IQR(reginol_node_positive, na.rm = TRUE),
+    
+    survival_months_Mean = mean(survival_months, na.rm = TRUE),
+    survival_months_SD = sd(survival_months, na.rm = TRUE),
+    survival_months_Median = median(survival_months, na.rm = TRUE),
+    survival_months_IQR = IQR(survival_months, na.rm = TRUE)
+  )
+
+final_table = data.frame(
+  Variable = c("Age", "Tumor Size", "Regional Nodes Examined", "Regional Nodes Positive", "Survival Months"),
+  Mean = c(summary_table$age_Mean, summary_table$tumor_size_Mean, 
+           summary_table$regional_node_examined_Mean, summary_table$reginol_node_positive_Mean, 
+           summary_table$survival_months_Mean),
+  SD = c(summary_table$age_SD, summary_table$tumor_size_SD, 
+         summary_table$regional_node_examined_SD, summary_table$reginol_node_positive_SD, 
+         summary_table$survival_months_SD),
+  Median = c(summary_table$age_Median, summary_table$tumor_size_Median, 
+             summary_table$regional_node_examined_Median, summary_table$reginol_node_positive_Median, 
+             summary_table$survival_months_Median),
+  IQR = c(summary_table$age_IQR, summary_table$tumor_size_IQR, 
+          summary_table$regional_node_examined_IQR, summary_table$reginol_node_positive_IQR, 
+          summary_table$survival_months_IQR)
+)
+
+print(final_table)
+```
+
+    ##                  Variable      Mean        SD Median IQR
+    ## 1                     Age 53.972167  8.963134     54  14
+    ## 2              Tumor Size 30.473658 21.119696     25  22
+    ## 3 Regional Nodes Examined 14.357107  8.099675     14  10
+    ## 4 Regional Nodes Positive  4.158052  5.109331      2   4
+    ## 5         Survival Months 71.297962 22.921430     73  34
 
 The majority of patients in the dataset are White, accounting for
 approximately 84.82% of the total population. Black patients make up
@@ -216,7 +281,7 @@ survival_df |>
   )
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-8-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-9-1.png" width="90%" />
 
 The histogram shows the age distribution of patients. Most patients are
 aged between 40 and 70 years. The data is well spread across middle and
@@ -237,7 +302,7 @@ ggplot(survival_df, aes(x = tumor_size)) +
   )
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-9-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-10-1.png" width="90%" />
 
 This is the distribution of all tumor sizes, and most of the tumor sizes
 are smaller than 50 mm. We can find that the most frequent size is
@@ -257,7 +322,7 @@ ggplot(survival_df, aes(x = regional_node_examined)) +
   )
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-10-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-11-1.png" width="90%" />
 
 This plot maps the frequency of different number of examined regional
 nodes for each subject. The number of examined regional nodes for most
@@ -277,7 +342,7 @@ ggplot(survival_df, aes(x = reginol_node_positive)) +
   )
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-11-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-12-1.png" width="90%" />
 
 Then is the distribution of different number of positive reginol node
 for each subject. Over 2500 subjects only have 1 or 2 positive reginol
@@ -296,7 +361,7 @@ ggplot(survival_df, aes(x = grade)) +
     theme_minimal()
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-12-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-13-1.png" width="90%" />
 
 This bar chart provides an overview of how cancer cases are distributed
 across grades. Grade 2 represents the majority of cases, suggesting it
@@ -314,7 +379,7 @@ ggplot(survival_df, aes(x = status, y = survival_months)) +
   theme_minimal()
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-13-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-14-1.png" width="90%" />
 
 The Alive group has a higher median survival time (approximately 75
 months) with a relatively narrow interquartile range. However, there are
@@ -337,7 +402,7 @@ ggplot(survival_df, aes(x = tumor_size, y = t_stage)) +
   )
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-14-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-15-1.png" width="90%" />
 
 In this plot, we explore the tumor size distribution at different T
 stages. From T1 to T3, as the stage changes, both the mean tumor sizes
@@ -360,7 +425,7 @@ ggplot(survival_df, aes(x = survival_months, y = a_stage)) +
   facet_grid(~ status)
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-15-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-16-1.png" width="90%" />
 
 In the Regional stage, the Alive group has a higher median survival with
 outliers below 15 months, while the Dead group shows a lower median with
@@ -382,7 +447,7 @@ ggplot(survival_df, aes(x = differentiate, y = tumor_size)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-16-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-17-1.png" width="90%" />
 
 Lower grades (1–3) exhibit comparable tumor size distributions, with
 slight increases in variability as the grade increases.
@@ -410,7 +475,7 @@ ggplot(survival_df, aes(x = age, y = tumor_size, color = status)) +
     theme_minimal()
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-17-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-18-1.png" width="90%" />
 
 This figure highlights the differences in tumor size distribution and
 trends with age between individuals who are alive and those who are
@@ -433,7 +498,7 @@ ggplot(survival_df, aes(x = reginol_node_positive, y = survival_months)) +
   theme_minimal()
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-18-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-19-1.png" width="90%" />
 
 According to the trend lines, as it changes from undifferentiated to
 well differentiated, the negative correlation between the number of
@@ -467,7 +532,7 @@ survival_df |>
   facet_wrap(variable ~ .,  scales = "free")
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-20-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-21-1.png" width="90%" />
 
 # Model Building
 
@@ -731,7 +796,7 @@ augment(final_glm) |>
   labs(x = "Fitted value", y = "Residual")
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-22-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-23-1.png" width="90%" />
 
 ``` r
 augment_quantile(final_glm) |>
@@ -741,7 +806,7 @@ augment_quantile(final_glm) |>
   labs(x = "Fitted value", y = "Randomized quantile residual")
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-22-2.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-23-2.png" width="90%" />
 
 By randomizing the quantile residuals, we resolve the problem that the
 RVF plot always shows a pattern in logistic regression because of the
@@ -754,7 +819,7 @@ fit.
 plot(final_glm, which = 5)
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-23-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-24-1.png" width="90%" />
 
 The residual vs. leverage plot indicates that observations 3527, 1561,
 and 3074 may be potential outliers, but they are not necessarily
@@ -777,28 +842,28 @@ final_glm_df %>%
   knitr::kable(digits = 4)
 ```
 
-|                                        | estimate | std_error | z_value | p_value | odds_ratio |
-|:---------------------------------------|---------:|----------:|--------:|--------:|-----------:|
-| (Intercept)                            |  -2.2838 |    0.4385 | -5.2085 |  0.0000 |     0.1019 |
-| age                                    |   0.0238 |    0.0056 |  4.2426 |  0.0000 |     1.0241 |
-| raceOther                              |  -0.9346 |    0.2485 | -3.7616 |  0.0002 |     0.3928 |
-| raceWhite                              |  -0.5148 |    0.1617 | -3.1845 |  0.0014 |     0.5976 |
-| marital_statusMarried                  |  -0.2110 |    0.1416 | -1.4900 |  0.1362 |     0.8097 |
-| marital_statusSeparated                |   0.6691 |    0.3881 |  1.7240 |  0.0847 |     1.9526 |
-| marital_statusSingle                   |  -0.0646 |    0.1748 | -0.3696 |  0.7117 |     0.9374 |
-| marital_statusWidowed                  |   0.0175 |    0.2211 |  0.0791 |  0.9369 |     1.0176 |
-| t_stageT2                              |   0.4111 |    0.1130 |  3.6372 |  0.0003 |     1.5085 |
-| t_stageT3                              |   0.5516 |    0.1488 |  3.7077 |  0.0002 |     1.7360 |
-| t_stageT4                              |   1.0988 |    0.2445 |  4.4934 |  0.0000 |     3.0005 |
-| n_stageN2                              |   0.4363 |    0.1284 |  3.3987 |  0.0007 |     1.5470 |
-| n_stageN3                              |   0.5872 |    0.2345 |  2.5034 |  0.0123 |     1.7989 |
-| differentiateModerately differentiated |   0.5328 |    0.1838 |  2.8990 |  0.0037 |     1.7036 |
-| differentiatePoorly differentiated     |   0.9190 |    0.1924 |  4.7772 |  0.0000 |     2.5069 |
-| differentiateUndifferentiated          |   1.8649 |    0.5538 |  3.3672 |  0.0008 |     6.4551 |
-| estrogen_statusPositive                |  -0.7480 |    0.1775 | -4.2140 |  0.0000 |     0.4733 |
-| progesterone_statusPositive            |  -0.5842 |    0.1275 | -4.5811 |  0.0000 |     0.5576 |
-| regional_node_examined                 |  -0.0359 |    0.0072 | -5.0110 |  0.0000 |     0.9647 |
-| reginol_node_positive                  |   0.0797 |    0.0153 |  5.2076 |  0.0000 |     1.0829 |
+|  | estimate | std_error | z_value | p_value | odds_ratio |
+|:---|---:|---:|---:|---:|---:|
+| (Intercept) | -2.2838 | 0.4385 | -5.2085 | 0.0000 | 0.1019 |
+| age | 0.0238 | 0.0056 | 4.2426 | 0.0000 | 1.0241 |
+| raceOther | -0.9346 | 0.2485 | -3.7616 | 0.0002 | 0.3928 |
+| raceWhite | -0.5148 | 0.1617 | -3.1845 | 0.0014 | 0.5976 |
+| marital_statusMarried | -0.2110 | 0.1416 | -1.4900 | 0.1362 | 0.8097 |
+| marital_statusSeparated | 0.6691 | 0.3881 | 1.7240 | 0.0847 | 1.9526 |
+| marital_statusSingle | -0.0646 | 0.1748 | -0.3696 | 0.7117 | 0.9374 |
+| marital_statusWidowed | 0.0175 | 0.2211 | 0.0791 | 0.9369 | 1.0176 |
+| t_stageT2 | 0.4111 | 0.1130 | 3.6372 | 0.0003 | 1.5085 |
+| t_stageT3 | 0.5516 | 0.1488 | 3.7077 | 0.0002 | 1.7360 |
+| t_stageT4 | 1.0988 | 0.2445 | 4.4934 | 0.0000 | 3.0005 |
+| n_stageN2 | 0.4363 | 0.1284 | 3.3987 | 0.0007 | 1.5470 |
+| n_stageN3 | 0.5872 | 0.2345 | 2.5034 | 0.0123 | 1.7989 |
+| differentiateModerately differentiated | 0.5328 | 0.1838 | 2.8990 | 0.0037 | 1.7036 |
+| differentiatePoorly differentiated | 0.9190 | 0.1924 | 4.7772 | 0.0000 | 2.5069 |
+| differentiateUndifferentiated | 1.8649 | 0.5538 | 3.3672 | 0.0008 | 6.4551 |
+| estrogen_statusPositive | -0.7480 | 0.1775 | -4.2140 | 0.0000 | 0.4733 |
+| progesterone_statusPositive | -0.5842 | 0.1275 | -4.5811 | 0.0000 | 0.5576 |
+| regional_node_examined | -0.0359 | 0.0072 | -5.0110 | 0.0000 | 0.9647 |
+| reginol_node_positive | 0.0797 | 0.0153 | 5.2076 | 0.0000 | 1.0829 |
 
 ### Cross Validation
 
