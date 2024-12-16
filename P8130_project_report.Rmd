@@ -12,7 +12,55 @@ header-includes:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+library(car)
+library(leaps)
+library(lmtest)
+library(regressinator)
+library(broom)
+library(modelr)
+library(pROC)
+library(rsample)
+library(survival)
+library(dplyr)
+library(tidyr)
+library(ggsurvfit)
+library(survminer)
+set.seed(11)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%",
+  warning = FALSE,
+  message = FALSE
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+survival_df = read_csv("data/Project_2_data.csv") |>
+  janitor::clean_names() |>
+  mutate(
+    race = factor(race),
+    marital_status = factor(marital_status),
+    t_stage = factor(t_stage),
+    n_stage = factor(n_stage),
+    x6th_stage = factor(x6th_stage),
+    differentiate = factor(differentiate),
+    grade = factor(grade),
+    a_stage = factor(a_stage),
+    estrogen_status = factor(estrogen_status),
+    progesterone_status = factor(progesterone_status),
+    status = factor(status)
+  ) |>
+  mutate(
+    differentiate = factor(differentiate, levels = c("Well differentiated", 
+                                                     "Moderately differentiated",
+                                                     "Poorly differentiated",
+                                                     "Undifferentiated")),
+    differentiate = relevel(differentiate, ref = "Well differentiated")
+  )
 ```
 
 ## Abstract
@@ -50,6 +98,8 @@ The dataset comprises a total of `r count(survival_df)` observations, with no mi
 
 ## Results
 
+As shown in figure \@ref{distribution_of_the_continuous_variables}, we can find out that most patients are between 40 and 70 years old, and most of the survival time are larger than 45 months. The number of examined regional nodes for most subjects are smaller than 30, and the subjects with nearly 12 examined regional nodes are the most. It is worth noting that the distributions of both variables `reginol_node_positive` and `tumor_size` are significantly skewed to the right. Over 2500 subjects only have 1 or 2 positive reginol nodes, which is the most frequent number of positive reginol nodes. The number of examined regional nodes for most subjects are smaller than 30, and the subjects with nearly 12 examined regional nodes are the most.
+
 
 ## Conclusion/Discussion
 
@@ -57,8 +107,6 @@ The dataset comprises a total of `r count(survival_df)` observations, with no mi
 ## Group members' contribution
 
 Leyang and Jinghan focused on statistical methods, building models to extract meaningful insights. Yuechu and Yifei concentrated on data description and visualization, presenting information through clear visuals. All four of us contributed to the writing of the report, integrating our individual efforts into a cohesive final report that reflects both analytical depth and visual clarity.
-
-
 
 ## Appendix
 
