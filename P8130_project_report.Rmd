@@ -100,7 +100,7 @@ The dataset comprises a total of `r count(survival_df)` observations, with no mi
 
 As shown in figure \@ref{distribution_of_the_continuous_variables}, we can find out that most patients are between 40 and 70 years old, and most of the survival time are larger than 45 months. The number of examined regional nodes for most subjects are smaller than 30, and the subjects with nearly 12 examined regional nodes are the most. It is worth noting that the distributions of both variables `reginol_node_positive` and `tumor_size` are significantly skewed to the right. Over 2500 subjects only have 1 or 2 positive reginol nodes, which is the most frequent number of positive reginol nodes. Most of the tumor sizes are smaller than 50 mm, and we can find that the most frequent size is around 19 mm, followed by around 14 mm.
 
-The figure \@ref{survival_months_by_status} distributed the survival time by the status, showing that survival months are significantly higher for the Alive group compared to the Dead group. According the figure \@ref{tumor_sizes_by_t_stage}, from T1 to T3, as the stage changes, both the mean tumor sizes and IQR become larger. At T4 stage, the IQR of tumor sizes is much larger than others, and the mean size is smaller than the mean size at T3 stage. We notice that there are some potential outliers both ar T1 stage and T3 stage. The survival time is longer in the Regional stage, and the Alive group shows higher survival times across both stages by looking at the figure \@ref{survival_months_by_a_stage_based_on_status}. 
+The figure \@ref{survival_months_by_status} distributed the survival time by the status, showing that survival months are significantly higher for the Alive group compared to the Dead group. According the figure \@ref{tumor_sizes_by_t_stage}, from T1 to T3, as the stage changes, both the mean tumor sizes and IQR become larger. At T4 stage, the IQR of tumor sizes is much larger than others, and the mean size is smaller than the mean size at T3 stage. We notice that there are some potential outliers both ar T1 stage and T3 stage. The survival time is longer in the Regional stage, and the Alive group shows higher survival times across both stages by looking at the figure \@ref{survival_months_by_a_stage_based_on_status}. In the figure \@ref{tumor_size_by_differentiate}, the Undifferentiated group has larger tumor sizes compared to the other categories, while the Well, Moderately, and Poorly differentiated groups show similar distributions with many smaller tumors and numerous high-value outliers. The figure \@ref{relationship_between_age_and_tumor_size_across_status} highlights the differences in tumor size distribution and trends with age between individuals who are alive and those who are deceased. While the "Alive" group shows no significant relationship between age and tumor size, the "Dead" group exhibits a pattern where larger tumors are associated with younger ages. According the figure \@ref{positive_reginol_node_vs_survival_months_across_differentiate}, as it changes from undifferentiated to well differentiated, the negative correlation between the number of positive reginol nodes and the survival months becomes weaker.
 
 
 ## Conclusion/Discussion
@@ -184,4 +184,35 @@ ggplot(survival_df, aes(x = differentiate, y = tumor_size)) +
 ```
 
 
+
+
+```{r, echo=FALSE, fig.cap="Relationship Between Age and Tumor Size across Status", include=FALSE}
+ggplot(survival_df, aes(x = age, y = tumor_size, color = status)) +
+    geom_point(alpha = 0.5, size = 0.6) +
+  geom_smooth(method = "lm", color = "green") +
+  facet_wrap(~ status) +
+    labs(title = "Relationship Between Age and Tumor Size",
+         x = "Age (years)",
+         y = "Tumor Size (mm)",
+         color = "Status") +
+    theme_minimal()
+
+```
+
+
+
+
+
+```{r, echo=FALSE, fig.cap="Positive Reginol Node vs Survival Months Across Differentiate", include=FALSE}
+ggplot(survival_df, aes(x = reginol_node_positive, y = survival_months)) +
+  geom_point(color = "light blue", size = 0.5, alpha = 0.5)  +
+  facet_wrap(.~differentiate) +
+  geom_smooth(method = "lm") +
+  labs(
+    title = "Distribution of Positive Reginol Node and Survival Months by Differentiate",
+    x = "Positive Reginol Node",
+    y = "Survival Months"
+  ) +
+  theme_minimal()
+```
 
