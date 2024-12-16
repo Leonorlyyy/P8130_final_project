@@ -190,79 +190,35 @@ This table shows the frequency of different levels of `status` by 6th stage.
 
 # Distributions of the numeric variables
 
-## Age
-
-```{r}
+```{r, echo=FALSE, fig.cap="Distribution of the Continuous Variables", include=FALSE}
 survival_df |> 
-  ggplot(aes(age)) + 
-  geom_histogram(fill = "light blue", color = "black") + 
-  theme_minimal() +
-  labs(
-    title = "Distribution of age",
-    x = "Age",
-    y = "Frequency"
-  )
+  pivot_longer(
+    cols = c(age, tumor_size, regional_node_examined, reginol_node_positive, survival_months),
+    names_to = "variable",
+    values_to = "value"
+  ) |>
+  ggplot(aes(x = value)) +
+  geom_histogram(color = "light blue") +
+  facet_wrap(variable ~ .,  scales = "free") +
+    labs(title = "Distribution of the Continuous Variables",
+         x = "Variables",
+         y = "Frequency")
 ```
 
-The histogram shows the age distribution of patients. Most patients are aged between 40 and 70 years. The data is well spread across middle and older age groups, making it possible for age-related analysis. Therefore, age will likely be a significant predictor for later analysis.
+Most patients are aged between 40 and 70 years. The data is well spread across middle and older age groups, making it possible for age-related analysis. Therefore, age will likely be a significant predictor for later analysis.
 
-## Tumor size
+Then is the distribution of different number of positive reginol node for each subject. Over 2500 subjects only have 1 or 2 positive reginol nodes, which is the most frequent number of positive reginol nodes. It is strongly right-skewed, so we will use the log transformation for this variable. 
 
-```{r}
-ggplot(survival_df, aes(x = tumor_size)) +
-  geom_histogram(fill = "light blue", color = "black") +
-  scale_x_continuous(breaks = seq(0, max(survival_df$tumor_size, na.rm = TRUE), by = 5)) +
-  labs(
-    title = "Distribution of Tumor Size",
-    x = "Tumor Size (mm)",
-    y = "Frequency"
-  )
-```
+The third plot maps the frequency of different number of examined regional nodes for each subject. The number of examined regional nodes for most subjects are smaller than 30, and the subjects with nearly 12 examined regional nodes are the most.
 
-This is the distribution of all tumor sizes, and most of the tumor sizes are smaller than 50 mm. We can find that the most frequent size is around 19 mm, followed by around 14 mm. This distribution is right-skewed, so we will use the log transformation for this variable.
+Then is the distribution of the survival months, most of the survival time are larger than 45 months.
 
-## Examined regional node
+The last one is the distribution of all tumor sizes, and most of the tumor sizes are smaller than 50 mm. We can find that the most frequent size is around 19 mm, followed by around 14 mm. This distribution is right-skewed, so we will use the log transformation for this variable.
 
-```{r}
-ggplot(survival_df, aes(x = regional_node_examined)) +
-  geom_histogram(fill = "light blue", color = "black") +
-  scale_x_continuous(breaks = seq(0, max(survival_df$regional_node_examined, na.rm = TRUE), by = 5)) +
-  labs(
-    title = "Distribution of Examined Regional Node",
-    x = "Examined Regional Node",
-    y = "Frequency"
-  )
-```
 
-This plot maps the frequency of different number of examined regional nodes for each subject. The number of examined regional nodes for most subjects are smaller than 30, and the subjects with nearly 12 examined regional nodes are the most.
 
-## Positive regional node
 
-```{r}
-ggplot(survival_df, aes(x = reginol_node_positive)) +
-  geom_histogram(fill = "light blue", color = "black") +
-  scale_x_continuous(breaks = seq(0, max(survival_df$reginol_node_positive, na.rm = TRUE), by = 5)) +
-  labs(
-    title = "Distribution of Positive Reginol Node",
-    x = "Positive Reginol Node",
-    y = "Frequency"
-  )
-```
 
-Then is the distribution of different number of positive reginol node for each subject. Over 2500 subjects only have 1 or 2 positive reginol nodes, which is the most frequent number of positive reginol nodes. It is strongly right-skewed, so we will use the log transformation for this variable.
-
-## Differentiates
-
-```{r}
-ggplot(survival_df, aes(x = grade)) +
-    geom_bar(fill = "skyblue") +
-    labs(title = "Frequency Distribution of Cancer Grades",
-         x = "Grade",
-         y = "Count") +
-    theme_minimal()
-```
-
-This bar chart provides an overview of how cancer cases are distributed across grades. Grade 2 represents the majority of cases, suggesting it is the most frequently observed grade, while Grade IV is exceedingly rare.
 
 
 
@@ -295,12 +251,12 @@ ggplot(survival_df, aes(x = tumor_size, y = t_stage)) +
   )
 ```
 
-In this plot, we explore the tumor size distribution at different T stages. From T1 to T3, as the stage changes, both the mean tumor sizes and IQR become larger. At T4 stage, the IQR of tumor sizes is much larger than others, and the mean size is smaller than the mean size at T3 stage. We notice that there are some outliers both ar T1 stage and T3 stage.
+In this plot, we explore the tumor size distribution at different T stages. From T1 to T3, as the stage changes, both the mean tumor sizes and IQR become larger. At T4 stage, the IQR of tumor sizes is much larger than others, and the mean size is smaller than the mean size at T3 stage. We notice that there are some potential outliers both ar T1 stage and T3 stage.
 
 
 
 
-## Survival months by a_stage based on status(alive/dead)
+## Survival Months by A_stage Based on Status
 
 ```{r}
 ggplot(survival_df, aes(x = survival_months, y = a_stage)) +
@@ -330,11 +286,8 @@ ggplot(survival_df, aes(x = differentiate, y = tumor_size)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-Lower grades (1–3) exhibit comparable tumor size distributions, with slight increases in variability as the grade increases.
 
-Grade IV stands out due to its higher median and broader range, suggesting that more aggressive tumor grades are associated with larger tumor sizes.
-
-The Undifferentiated group has larger and more variable tumor sizes compared to the other categories, while the Well, Moderately, and Poorly differentiated groups show similar distributions with many smaller tumors and numerous high-value outliers.
+The Undifferentiated group has larger tumor sizes compared to the other categories, while the Well, Moderately, and Poorly differentiated groups show similar distributions with many smaller tumors and numerous high-value outliers.
 
 
 ## Relationship Between Age and Tumor Size across Status

@@ -98,7 +98,9 @@ The dataset comprises a total of `r count(survival_df)` observations, with no mi
 
 ## Results
 
-As shown in figure \@ref{distribution_of_the_continuous_variables}, we can find out that most patients are between 40 and 70 years old, and most of the survival time are larger than 45 months. The number of examined regional nodes for most subjects are smaller than 30, and the subjects with nearly 12 examined regional nodes are the most. It is worth noting that the distributions of both variables `reginol_node_positive` and `tumor_size` are significantly skewed to the right. Over 2500 subjects only have 1 or 2 positive reginol nodes, which is the most frequent number of positive reginol nodes. The number of examined regional nodes for most subjects are smaller than 30, and the subjects with nearly 12 examined regional nodes are the most.
+As shown in figure \@ref{distribution_of_the_continuous_variables}, we can find out that most patients are between 40 and 70 years old, and most of the survival time are larger than 45 months. The number of examined regional nodes for most subjects are smaller than 30, and the subjects with nearly 12 examined regional nodes are the most. It is worth noting that the distributions of both variables `reginol_node_positive` and `tumor_size` are significantly skewed to the right. Over 2500 subjects only have 1 or 2 positive reginol nodes, which is the most frequent number of positive reginol nodes. Most of the tumor sizes are smaller than 50 mm, and we can find that the most frequent size is around 19 mm, followed by around 14 mm.
+
+The figure \@ref{survival_months_by_status} distributed the survival time by the status, showing that survival months are significantly higher for the Alive group compared to the Dead group. According the figure \@ref{tumor_sizes_by_t_stage}, from T1 to T3, as the stage changes, both the mean tumor sizes and IQR become larger. At T4 stage, the IQR of tumor sizes is much larger than others, and the mean size is smaller than the mean size at T3 stage. We notice that there are some potential outliers both ar T1 stage and T3 stage. The survival time is longer in the Regional stage, and the Alive group shows higher survival times across both stages by looking at the figure \@ref{survival_months_by_a_stage_based_on_status}. 
 
 
 ## Conclusion/Discussion
@@ -107,6 +109,9 @@ As shown in figure \@ref{distribution_of_the_continuous_variables}, we can find 
 ## Group members' contribution
 
 Leyang and Jinghan focused on statistical methods, building models to extract meaningful insights. Yuechu and Yifei concentrated on data description and visualization, presenting information through clear visuals. All four of us contributed to the writing of the report, integrating our individual efforts into a cohesive final report that reflects both analytical depth and visual clarity.
+
+
+
 
 ## Appendix
 
@@ -129,6 +134,54 @@ survival_df |>
 
 
 
+
+
+```{r, echo=FALSE, fig.cap="Survival Months by Status", include=FALSE}
+ggplot(survival_df, aes(x = status, y = survival_months)) + 
+  geom_boxplot(fill = "light blue") +
+  labs(title = "Boxplot of Survival Months by Status", x = "Status", y = "Survival Months") +
+  theme_minimal()
+```
+
+
+
+
+```{r, echo=FALSE, fig.cap="Tumor Sizes by T_stage", include=FALSE}
+ggplot(survival_df, aes(x = tumor_size, y = t_stage)) +
+  geom_boxplot(fill = "light blue") +
+  scale_x_continuous(breaks = seq(0, max(survival_df$tumor_size, na.rm = TRUE), by = 10)) +
+  labs(
+    title = "Distribution of Tumor Sizes by T_stage",
+    x = "Tumor Sizes",
+    y = "T_stage"
+  )
+```
+
+
+
+```{r, echo=FALSE, fig.cap="Survival Months by A_stage Based on Status", include=FALSE}
+ggplot(survival_df, aes(x = survival_months, y = a_stage)) +
+  geom_boxplot(fill = "light blue") +
+  scale_x_continuous(breaks = seq(0, max(survival_df$survival_months, na.rm = TRUE), by = 10)) +
+  labs(
+    title = "Distribution of Survival Months by A_stage",
+    x = "Survival Months",
+    y = "A_stage"
+  ) +
+  facet_grid(~ status)
+```
+
+
+
+```{r, echo=FALSE, fig.cap="Tumor Size by Differentiate", include=FALSE}
+ggplot(survival_df, aes(x = differentiate, y = tumor_size)) +
+  geom_boxplot(fill = "lightblue") +
+  labs(title = "Tumor Size Distribution by Differentiate",
+       x = "Differentiate",
+       y = "Tumor Size (mm)") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
 
 
 
