@@ -2,7 +2,7 @@
 title: "P8130_final_project"
 author: "Yifei Yu"
 date: "2024-12-03"
-output: pdf_document
+output:pdf_document
 editor_options: 
   chunk_output_type: console
   fontsize: 12pt
@@ -27,6 +27,7 @@ library(dplyr)
 library(tidyr)
 library(ggsurvfit)
 library(survminer)
+library(bookdown)
 set.seed(11)
 
 knitr::opts_chunk$set(
@@ -73,7 +74,7 @@ The data we used for this analysis originates from a breast cancer survival data
 ## Methods
 
 
-This report was conducted using `survival_data`, which contains information about breast cancer patients from a prospective study. The dimension of this dataset is `r nrow(survival_df)` rows * `r ncol(survival_df)` columns. It contains five numeric variables, which are `age`, `tumor_size`, `regional_node_examined`, `reginol_node_positive`, and `survival_months`, and eleven categorical variables, which are `race`, `marital_status`, `t_stage`, `n_stage`, `x6th_stage`, `differentiate`, `grade`, `a_stage`, `estrogen_status`, `progesterone_status`, and `status`. Key variables in the dataset include:
+This report was conducted using `survival_data`, which contains information about breast cancer patients from a prospective study. The dimension of this dataset is \texttt{`r nrow(survival_df)` rows and `r ncol(survival_df)` columns}. It contains five numeric variables, which are `age`, `tumor_size`, `regional_node_examined`, `reginol_node_positive`, and `survival_months`, and eleven categorical variables, which are `race`, `marital_status`, `t_stage`, `n_stage`, `x6th_stage`, `differentiate`, `grade`, `a_stage`, `estrogen_status`, `progesterone_status`, and `status`. Key variables in the dataset include:
 
 **age**: The age of the patient (in years).
 
@@ -91,16 +92,16 @@ parts of the body remote from).
 **survival_month**: The time of a patient with breast cancer is expected to live after their diagnosis (in months).
 
 
-The dataset comprises a total of `r count(survival_df)` observations, with no missing values in the primary variables analyzed. Firstly, after cleaning and tidying the data, we could figure out the distributions of the data and check for potential outliers or influential points by plotting the distributions of the variables, such as histograms and box plots. We also examine the pairwise relationships between variables.
+The dataset comprises a total of \texttt{`r count(survival_df)`} observations, with no missing values in the primary variables analyzed. Firstly, after cleaning and tidying the data, we could figure out the distributions of the data and check for potential outliers or influential points by plotting the distributions of the variables, such as histograms and box plots. We also examine the pairwise relationships between variables.
 
 
 
 
 ## Results
 
-As shown in figure \@ref{distribution_of_the_continuous_variables}, we can find out that most patients are between 40 and 70 years old, and most of the survival time are larger than 45 months. The number of examined regional nodes for most subjects are smaller than 30, and the subjects with nearly 12 examined regional nodes are the most. It is worth noting that the distributions of both variables `reginol_node_positive` and `tumor_size` are significantly skewed to the right. Over 2500 subjects only have 1 or 2 positive reginol nodes, which is the most frequent number of positive reginol nodes. Most of the tumor sizes are smaller than 50 mm, and we can find that the most frequent size is around 19 mm, followed by around 14 mm.
+As shown in figure \@ref(fig:distribution_of_the_continuous_variables), we can find out that most patients are between 40 and 70 years old, and most of the survival time are larger than 45 months. The number of examined regional nodes for most subjects are smaller than 30, and the subjects with nearly 12 examined regional nodes are the most. It is worth noting that the distributions of both variables `reginol_node_positive` and `tumor_size` are significantly skewed to the right. Over 2500 subjects only have 1 or 2 positive reginol nodes, which is the most frequent number of positive reginol nodes. Most of the tumor sizes are smaller than 50 mm, and we can find that the most frequent size is around 19 mm, followed by around 14 mm.
 
-The figure \@ref{survival_months_by_status} distributed the survival time by the status, showing that survival months are significantly higher for the Alive group compared to the Dead group. According the figure \@ref{tumor_sizes_by_t_stage}, from T1 to T3, as the stage changes, both the mean tumor sizes and IQR become larger. At T4 stage, the IQR of tumor sizes is much larger than others, and the mean size is smaller than the mean size at T3 stage. We notice that there are some potential outliers both ar T1 stage and T3 stage. The survival time is longer in the Regional stage, and the Alive group shows higher survival times across both stages by looking at the figure \@ref{survival_months_by_a_stage_based_on_status}. In the figure \@ref{tumor_size_by_differentiate}, the Undifferentiated group has larger tumor sizes compared to the other categories, while the Well, Moderately, and Poorly differentiated groups show similar distributions with many smaller tumors and numerous high-value outliers. The figure \@ref{relationship_between_age_and_tumor_size_across_status} highlights the differences in tumor size distribution and trends with age between individuals who are alive and those who are deceased. While the "Alive" group shows no significant relationship between age and tumor size, the "Dead" group exhibits a pattern where larger tumors are associated with younger ages. According the figure \@ref{positive_reginol_node_vs_survival_months_across_differentiate}, as it changes from undifferentiated to well differentiated, the negative correlation between the number of positive reginol nodes and the survival months becomes weaker.
+The figure \@ref(fig:survival_months_by_status) distributed the survival time by the status, showing that survival months are significantly higher for the Alive group compared to the Dead group. According the figure \@ref(fig:tumor_sizes_by_t_stage), from T1 to T3, as the stage changes, both the mean tumor sizes and IQR become larger. At T4 stage, the IQR of tumor sizes is much larger than others, and the mean size is smaller than the mean size at T3 stage. We notice that there are some potential outliers both ar T1 stage and T3 stage. The survival time is longer in the Regional stage, and the Alive group shows higher survival times across both stages by looking at the figure \@ref(fig:survival_months_by_a_stage_based_on_status). In the figure \@ref(fig:tumor_size_by_differentiate), the Undifferentiated group has larger tumor sizes compared to the other categories, while the Well, Moderately, and Poorly differentiated groups show similar distributions with many smaller tumors and numerous high-value outliers. The figure \@ref(fig:relationship_between_age_and_tumor_size_across_status) highlights the differences in tumor size distribution and trends with age between individuals who are alive and those who are deceased. While the "Alive" group shows no significant relationship between age and tumor size, the "Dead" group exhibits a pattern where larger tumors are associated with younger ages. According the figure \@ref(fig:positive_reginol_node_vs_survival_months_across_differentiate), as it changes from undifferentiated to well differentiated, the negative correlation between the number of positive reginol nodes and the survival months becomes weaker.
 
 
 ## Conclusion/Discussion
@@ -116,103 +117,4 @@ Leyang and Jinghan focused on statistical methods, building models to extract me
 ## Appendix
 
 
-
-```{r, echo=FALSE, fig.cap="Distribution of the Continuous Variables", include=FALSE}
-survival_df |> 
-  pivot_longer(
-    cols = c(age, tumor_size, regional_node_examined, reginol_node_positive, survival_months),
-    names_to = "variable",
-    values_to = "value"
-  ) |>
-  ggplot(aes(x = value)) +
-  geom_histogram(color = "light blue") +
-  facet_wrap(variable ~ .,  scales = "free") +
-    labs(title = "Distribution of the Continuous Variables",
-         x = "Variables",
-         y = "Frequency")
-```
-
-
-
-
-
-```{r, echo=FALSE, fig.cap="Survival Months by Status", include=FALSE}
-ggplot(survival_df, aes(x = status, y = survival_months)) + 
-  geom_boxplot(fill = "light blue") +
-  labs(title = "Boxplot of Survival Months by Status", x = "Status", y = "Survival Months") +
-  theme_minimal()
-```
-
-
-
-
-```{r, echo=FALSE, fig.cap="Tumor Sizes by T_stage", include=FALSE}
-ggplot(survival_df, aes(x = tumor_size, y = t_stage)) +
-  geom_boxplot(fill = "light blue") +
-  scale_x_continuous(breaks = seq(0, max(survival_df$tumor_size, na.rm = TRUE), by = 10)) +
-  labs(
-    title = "Distribution of Tumor Sizes by T_stage",
-    x = "Tumor Sizes",
-    y = "T_stage"
-  )
-```
-
-
-
-```{r, echo=FALSE, fig.cap="Survival Months by A_stage Based on Status", include=FALSE}
-ggplot(survival_df, aes(x = survival_months, y = a_stage)) +
-  geom_boxplot(fill = "light blue") +
-  scale_x_continuous(breaks = seq(0, max(survival_df$survival_months, na.rm = TRUE), by = 10)) +
-  labs(
-    title = "Distribution of Survival Months by A_stage",
-    x = "Survival Months",
-    y = "A_stage"
-  ) +
-  facet_grid(~ status)
-```
-
-
-
-```{r, echo=FALSE, fig.cap="Tumor Size by Differentiate", include=FALSE}
-ggplot(survival_df, aes(x = differentiate, y = tumor_size)) +
-  geom_boxplot(fill = "lightblue") +
-  labs(title = "Tumor Size Distribution by Differentiate",
-       x = "Differentiate",
-       y = "Tumor Size (mm)") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-```
-
-
-
-
-```{r, echo=FALSE, fig.cap="Relationship Between Age and Tumor Size across Status", include=FALSE}
-ggplot(survival_df, aes(x = age, y = tumor_size, color = status)) +
-    geom_point(alpha = 0.5, size = 0.6) +
-  geom_smooth(method = "lm", color = "green") +
-  facet_wrap(~ status) +
-    labs(title = "Relationship Between Age and Tumor Size",
-         x = "Age (years)",
-         y = "Tumor Size (mm)",
-         color = "Status") +
-    theme_minimal()
-
-```
-
-
-
-
-
-```{r, echo=FALSE, fig.cap="Positive Reginol Node vs Survival Months Across Differentiate", include=FALSE}
-ggplot(survival_df, aes(x = reginol_node_positive, y = survival_months)) +
-  geom_point(color = "light blue", size = 0.5, alpha = 0.5)  +
-  facet_wrap(.~differentiate) +
-  geom_smooth(method = "lm") +
-  labs(
-    title = "Distribution of Positive Reginol Node and Survival Months by Differentiate",
-    x = "Positive Reginol Node",
-    y = "Survival Months"
-  ) +
-  theme_minimal()
-```
 

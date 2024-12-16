@@ -190,7 +190,7 @@ This table shows the frequency of different levels of `status` by 6th stage.
 
 # Distributions of the numeric variables
 
-```{r, echo=FALSE, fig.cap="Distribution of the Continuous Variables", include=FALSE}
+```{r distribution_of_the_continuous_variables, echo=FALSE, fig.cap="Distribution of the Continuous Variables"}
 survival_df |> 
   pivot_longer(
     cols = c(age, tumor_size, regional_node_examined, reginol_node_positive, survival_months),
@@ -226,9 +226,9 @@ The last one is the distribution of all tumor sizes, and most of the tumor sizes
 # Bewteen Variables 
 
 
-## Survival months by status
+## Survival Months by Status
 
-```{r}
+```{r survival_months_by_status, echo=FALSE, fig.cap="Survival_Months_by_Status"}
 ggplot(survival_df, aes(x = status, y = survival_months)) + 
   geom_boxplot(fill = "light blue") +
   labs(title = "Boxplot of Survival Months by Status", x = "Status", y = "Survival Months") +
@@ -238,9 +238,9 @@ ggplot(survival_df, aes(x = status, y = survival_months)) +
 The Alive group has a higher median survival time (approximately 75 months) with a relatively narrow interquartile range. However, there are several outliers below 15 survival months, indicating cases of unusually short survival. In contrast, the Dead group has a lower median survival time (around 45 months) with a wider interquartile range, reflecting greater variability. Overall, survival months are significantly higher for the Alive group compared to the Dead group.
 
 
-## Tumor sizes by t_stage
+## Tumor Sizes by T_stage
 
-```{r}
+```{r tumor_sizes_by_t_stage, echo=FALSE, fig.cap="Tumor Sizes by T_stage"}
 ggplot(survival_df, aes(x = tumor_size, y = t_stage)) +
   geom_boxplot(fill = "light blue") +
   scale_x_continuous(breaks = seq(0, max(survival_df$tumor_size, na.rm = TRUE), by = 10)) +
@@ -258,7 +258,7 @@ In this plot, we explore the tumor size distribution at different T stages. From
 
 ## Survival Months by A_stage Based on Status
 
-```{r}
+```{r survival_months_by_a_stage_based_on_status, echo=FALSE, fig.cap="Survival Months by A_stage Based on Status"}
 ggplot(survival_df, aes(x = survival_months, y = a_stage)) +
   geom_boxplot(fill = "light blue") +
   scale_x_continuous(breaks = seq(0, max(survival_df$survival_months, na.rm = TRUE), by = 10)) +
@@ -276,7 +276,7 @@ In the Regional stage, the Alive group has a higher median survival with outlier
 
 ## Tumor Size by Differentiate
 
-```{r}
+```{r tumor_size_by_differentiate, echo=FALSE, fig.cap="Tumor Size by Differentiate"}
 ggplot(survival_df, aes(x = differentiate, y = tumor_size)) +
   geom_boxplot(fill = "lightblue") +
   labs(title = "Tumor Size Distribution by Differentiate",
@@ -292,7 +292,7 @@ The Undifferentiated group has larger tumor sizes compared to the other categori
 
 ## Relationship Between Age and Tumor Size across Status
 
-```{r}
+```{r relationship_between_age_and_tumor_size_across_status, echo=FALSE, fig.cap="Relationship Between Age and Tumor Size across Status"}
 ggplot(survival_df, aes(x = age, y = tumor_size, color = status)) +
     geom_point(alpha = 0.5, size = 0.6) +
   geom_smooth(method = "lm", color = "green") +
@@ -312,7 +312,7 @@ This figure highlights the differences in tumor size distribution and trends wit
 ## Positive Reginol Node vs Survival Months Across Differentiate
 
 
-```{r}
+```{r positive_reginol_node_vs_survival_months_across_differentiate}, echo=FALSE, fig.cap="Positive Reginol Node vs Survival Months Across Differentiate"}
 ggplot(survival_df, aes(x = reginol_node_positive, y = survival_months)) +
   geom_point(color = "light blue", size = 0.5, alpha = 0.5)  +
   facet_wrap(.~differentiate) +
