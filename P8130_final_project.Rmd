@@ -18,6 +18,7 @@ library(regressinator)
 library(broom)
 library(modelr)
 library(pROC)
+library(rsample)
 library(survival)
 library(ggsurvfit)
 library(survminer)
@@ -460,7 +461,7 @@ forward_glm = MASS::stepAIC(full_glm, direction = "forward", trace = FALSE)
 
 forward_glm %>% 
   broom::tidy() %>% 
-  knitr::kable()
+  knitr::kable(digits = 4)
 ```
 
 #### Backward Elimination
@@ -470,17 +471,17 @@ backward_glm = MASS::stepAIC(full_glm, direction = "backward", trace = FALSE)
 
 backward_glm %>% 
   broom::tidy() %>% 
-  knitr::kable()
+  knitr::kable(digits = 4)
 ```
 
 #### Stepwise Regression
 
 ```{r stepwise}
-stepwise_glm = step(full_glm)
+stepwise_glm = MASS::stepAIC(full_glm, direction = "both", trace = FALSE)
 
 stepwise_glm %>% 
   broom::tidy() %>% 
-  knitr::kable()
+  knitr::kable(digits = 4)
 ```
 
 The backward and stepwise procedure produced the same model.
@@ -499,9 +500,8 @@ model_selection =
   unnest(result) %>%
   select(type, AIC, BIC)
 
-
 model_selection %>%
-  knitr::kable(digits = 3, caption = "Model Selection")
+  knitr::kable(digits = 4, caption = "Model Selection")
 
 final_glm = stepwise_glm
 ```
@@ -513,7 +513,8 @@ By comparing AIC and BIC, we can see the model given by backward elimination or 
 ### Model Diagnostics
 
 ```{r}
-vif(final_glm)
+vif(final_glm) %>% 
+  knitr::kable(digits = 4)
 ```
 
 Variance Inflation Factor is a commonly used method for detecting multicollinearity in regression models. VIF is generally calculated for the continuous variables, and Generalized Variance Inflation Factor (GVIF) is used for evaluating the multicollinearity for categorical variables.
@@ -558,7 +559,7 @@ final_glm_df =
   rename(p_value = pr_z)
 
 final_glm_df %>% 
-  knitr::kable()
+  knitr::kable(digits = 4)
 ```
 
 ### Cross Validation
@@ -582,22 +583,10 @@ glm_fit = function(data) {
 }
 
 cv_df = 
-  crossv_kfold(survival_df, k = 5) |>
+  crossv_kfold(survival_df, k = 10) |>
   mutate(
     train = map(train, as_tibble),
     test = map(test, as_tibble)
-  )
-
-
-cv_res_df = 
-  cv_df |>
-  mutate(
-    final_model = map(train, \(x) glm_fit(data = x)),
-    log_loss = map2_dbl(final_model, test, \(model, test_data) {
-      predicted_probs = predict(model, newdata = test_data, type = "response")
-      actual_outcomes = test_data$status
-      log_loss(actual_outcomes, predicted_probs)
-    })
   )
 
 cv_res_df = 
@@ -608,25 +597,115 @@ cv_res_df =
                                predict(fit, newdata = data, type = "response")),
     actual_outcomes = map(test, pull, status),
     log_loss = map2_dbl(actual_outcomes, predicted_probs, \(x, y) log_loss(x, y)),
-    auc = map2_dbl(actual_outcomes, predicted_probs, \(x, y) {
+    AUC = map2_dbl(actual_outcomes, predicted_probs, \(x, y) {
       roc_obj = roc(x, y)  
       auc(roc_obj)  
     })
   )
 
 cv_res_df %>% 
-  select(log_loss, auc)
-
-CV_log_loss = mean(cv_res_df$log_loss)
-CV_log_loss
-
+  select(log_loss, AUC) %>% 
+  knitr::kable(digits = 4)
 ```
 
-Since the CV_log_loss is very small, the model is a good fit by cross validation. 
 
+After applying 10-fold cross-validation, we evaluate the goodness of fit by log loss and AUC. The mean of log loss is `r mean(cv_res_df$log_loss)`, and the mean of AUC is `r mean(cv_res_df$AUC)`.
+
+
+### Evaluation Across Races
 
 - Evaluate the performance of your model(s). Is your model achieving similar performance
 between the majority race group “White” and the minority “Black” (or “Black” + “Other”)? If not, could you try to improve the fairness (i.e., reducing the gap of prediction performance between the majority and minority) of your model(s)?
+
+```{r eval_races}
+eval_produce = function(model, df) {
+  
+  results = 
+    df %>% 
+    mutate(predicted_probs = predict(model, newdata = ., type = "response")) %>% 
+    group_by(race) %>% 
+    summarize(
+      log_loss = log_loss(status, predicted_probs),
+      AUC = {
+        roc_obj = roc(status, predicted_probs)
+        auc_value = auc(roc_obj)  # Extract the numeric value of AUC
+        as.numeric(auc_value)
+        }
+      ) %>% 
+    ungroup() %>% 
+    select(race, log_loss, AUC)
+  
+  return(results)
+  
+}
+
+stra_cv_df = 
+  survival_df %>%
+  mutate(
+    race = fct_collapse(
+      race,
+      "Black or other" = c("Black", "Other")  
+    )
+  ) %>% 
+  vfold_cv(v = 10, strata = race) %>% 
+  mutate(
+    train = map(splits, training),
+    test = map(splits, testing)
+  )
+
+stra_res_df = 
+  stra_cv_df %>% 
+  mutate(
+    final_model = map(train, \(x) glm_fit(data = x)),
+    results = map2(final_model, test, \(x, y) eval_produce(x, y))
+  )
+
+stra_res_df %>% 
+  select(results) %>% 
+  unnest(cols = c(results)) %>% 
+  group_by(race) %>%
+  summarise(
+    avg_log_loss = mean(log_loss),
+    avg_AUC = mean(AUC)
+  ) %>% 
+  knitr::kable(digits = 4)
+```
+
+Low log loss and high AUC indicate better test performance.
+
+To reduce the gap of prediction performance between the majority and minority, we can try to add an interaction term in the model.
+
+```{r interaction}
+glm_inter_fit = function(data) {
+  
+  fit = glm(formula = status ~ age + race + marital_status + t_stage + n_stage + 
+        differentiate + estrogen_status + progesterone_status + 
+        regional_node_examined + reginol_node_positive + age * race + marital_status * race, 
+        family = binomial, data = data)
+  
+  return(fit)
+  
+}
+
+inter_res_df = 
+  stra_cv_df %>% 
+  mutate(
+    final_model = map(train, \(x) glm_inter_fit(data = x)),
+    results = map2(final_model, test, \(x, y) eval_produce(x, y))
+  ) 
+
+inter_res_df %>% 
+  select(results) %>% 
+  unnest(cols = c(results)) %>% 
+  group_by(race) %>%
+  summarise(
+    avg_log_loss = mean(log_loss),
+    avg_AUC = mean(AUC)
+  ) %>% 
+  knitr::kable(digits = 4)
+```
+
+By adding interaction term `age * race` and `marital_status * race`, we can observe a decrease in log loss and an increase in AUC, which means an improve in the fairness between group “White” and the minority “Black” + “Other”.
 
 ## Survival Analysis
 
@@ -636,6 +715,8 @@ surv_obj = Surv(time = survival_df$survival_months, event = survival_df$status)
 
 ### Kaplan Meier Curve
 
+The Kaplan Meier curve graphically represent the survival rate. Time is plotted on the x-axis and the survival rate is plotted on the y-axis.
+
 ```{r km_curve}
 km_fit = survfit(surv_obj ~ 1, data = survival_df)
 
@@ -644,11 +725,37 @@ ggsurvfit(km_fit, type = "survival", linewidth = 1) +
        y = "Overall survival",
        title = "Kaplan-Meier Survival Curve") +
   add_confidence_interval() +
-  add_risktable() +
   scale_ggsurvfit()
 ```
 
-### Cox Regression
+### Log Rank Test
+
+The log rank test lets us test whether there is a difference in survival times between groups of patients. For example, we want to find out whether there is a significant difference in survival between patients whose cells have different degrees of differentiation.
+
+```{r log_rank, fig.asp = .8}
+log_rank_fit = survfit(surv_obj ~ differentiate, data = survival_df)
+
+
+log_rank_plot = 
+  ggsurvplot(log_rank_fit, data = survival_df,
+           size = 1, palette = "RdBu",
+           censor.shape = '|', censor.size = 2,
+           conf.int = TRUE, pval = TRUE,
+           ggtheme = theme_bw(),
+           legend = "bottom",
+           legend.title = "Legend",
+           legend.labs = c("Well differentiated", "Moderately differentiated",
+                           "Poorly differentiated", "Undifferentiated"))
+
+log_rank_plot$plot +
+  ggtitle("Survival Time Across Differentiated Stages") +
+  guides(color = guide_legend(nrow = 2))
+```
+
+
+### Cox Model
+
+The limitation of KM curves and log-rank tests is that we can only test one variable at a time. To further discuss the risk factors to survival time, we will compute the cox proportional hazard model to adjusts for multiple risk factors simultaneously.
 
 ```{r cox_model}
 cox_model = coxph(surv_obj ~ 
@@ -656,15 +763,43 @@ cox_model = coxph(surv_obj ~
                        differentiate + a_stage + tumor_size + estrogen_status +
                        progesterone_status + regional_node_examined + reginol_node_positive, 
                   data = as.data.frame(survival_df))
-cox.zph(cox_model)
 ```
 
+The cox proportional hazard model has a assumption: the survival curves for two different
+strata of a risk factor must have hazard functions that are proportional over time. This assumption is satisfied when the change in hazard from one category to the next does not depend on time. That is, a person in one stratum has the same instantaneous relative risk compared to a person in a different stratum, irrespective of how much time has passed. 
 
-```{r forest_plot, fig.asp = 1.5}
-ggforest(cox_model)
+We will test this assumption based on the scaled Schoenfeld residuals. Here is an interpretation of the results: When p-val < 0.05, there is evidence against the proportional hazards assumption, meaning that the HR is not constant over time. Similarly, the larger the chi-square value, the greater the violation of the assumption.
+
+```{r cox_diagnostics}
+cox.zph(cox_model) %>%
+  .$table %>%
+  as.data.frame() %>% 
+  knitr::kable(digits = 4)
 ```
 
-The x-axis of this forest plot represents hazard ratios. HR = 1 means no significant difference compared to the reference, and a HR higher than 1 means it increases the hazard ratio of the event, death, and a HR lower than 1 decreases it.
+We can see from the table that variable `a_stage`, `estrogen_status`, `progesterone_status` are not constant over time, which means it's not proper to contain these covariates in cox regression. To reduce bias of the model, we can remove these variables and take a closer look at the result.
+
+```{r forest_plot, fig.asp = 1.5, out.width="100%"}
+cox_new_model = coxph(surv_obj ~ age + race + marital_status + t_stage + n_stage + x6th_stage +
+                      differentiate + tumor_size + regional_node_examined + reginol_node_positive,
+                    data = as.data.frame(survival_df))
+
+ggforest(cox_new_model,
+         fontsize = 0.6)
+```
+
+The hazard ratio is similar to relative risk, but differs in that the HR is the instantaneous risk rather than the cumulative risk over the entire study. 
+
+The x-axis of this forest plot represents hazard ratios. Hazard ratio = 1 means no significant difference compared to the reference, and a HR higher than 1 means it increases the hazard ratio of the event, death, and a HR lower than 1 decreases it. The smaller the p-value is the stronger the weight of evidence that the two groups are different. 
+
+We can conclude from the plot that for the variable race, blacks have the highest risk of death, followed by whites, while the lowest mortality rate is for other ethnic groups. In the variable marital status, the risk of death is significantly higher for separated people, but this may be due to information bias caused by fewer observations. The confidence intervals for the other categories of marital status all contain the null hypothesis, meaning that there is no significant difference.
+
+The risk of death is highest for patients with N stage N3, followed by N2, and finally N1. Differently, although T stage also shows a similar trend, the confidence intervals of each stage level contain the null hypothesis, meaning that there is no significant difference between levels. For the 6th stage, IIIB has the highest risk of death, followed by IIB, and then IIA, but there is no significant difference. For stage IIIC, since it contains the same information as N3 of N stage, no comparison is made in this variable.
+
+In the variable differentiated, the risk of death is significantly highest for undifferentiated, and then decreases in the order of poorly differentiated, moderately differentiated, and well differentiated.
+
+For the variables tumor size, regional node examined, and reginol node postive, we did not observe significant differences in the risk of death.
+
 
 
 

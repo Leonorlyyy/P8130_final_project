@@ -628,37 +628,37 @@ forward_glm = MASS::stepAIC(full_glm, direction = "forward", trace = FALSE)
 
 forward_glm %>% 
   broom::tidy() %>% 
-  knitr::kable()
+  knitr::kable(digits = 4)
 ```
 
-| term                                   |   estimate | std.error |  statistic |   p.value |
-|:---------------------------------------|-----------:|----------:|-----------:|----------:|
-| (Intercept)                            | -2.3128223 | 0.5137669 | -4.5016957 | 0.0000067 |
-| age                                    |  0.0241699 | 0.0056199 |  4.3007984 | 0.0000170 |
-| raceOther                              | -0.9235406 | 0.2486035 | -3.7149140 | 0.0002033 |
-| raceWhite                              | -0.5097774 | 0.1618144 | -3.1503827 | 0.0016306 |
-| marital_statusMarried                  | -0.2102748 | 0.1417668 | -1.4832442 | 0.1380095 |
-| marital_statusSeparated                |  0.6717802 | 0.3874652 |  1.7337821 | 0.0829568 |
-| marital_statusSingle                   | -0.0677682 | 0.1750670 | -0.3870986 | 0.6986832 |
-| marital_statusWidowed                  |  0.0234528 | 0.2210320 |  0.1061061 | 0.9154982 |
-| t_stageT2                              |  0.2821932 | 0.1953845 |  1.4442965 | 0.1486556 |
-| t_stageT3                              |  0.5359069 | 0.3137751 |  1.7079331 | 0.0876488 |
-| t_stageT4                              |  0.9542320 | 0.4500716 |  2.1201781 | 0.0339910 |
-| n_stageN2                              |  0.6208066 | 0.2391834 |  2.5955259 | 0.0094446 |
-| n_stageN3                              |  0.6910134 | 0.3007413 |  2.2977003 | 0.0215789 |
-| x6th_stageIIB                          |  0.2143223 | 0.2318280 |  0.9244883 | 0.3552321 |
-| x6th_stageIIIA                         | -0.0871350 | 0.2950089 | -0.2953639 | 0.7677159 |
-| x6th_stageIIIB                         |  0.0887019 | 0.5289101 |  0.1677069 | 0.8668139 |
-| x6th_stageIIIC                         |         NA |        NA |         NA |        NA |
-| differentiateModerately differentiated |  0.5367572 | 0.1840814 |  2.9158684 | 0.0035470 |
-| differentiatePoorly differentiated     |  0.9251853 | 0.1928527 |  4.7973682 | 0.0000016 |
-| differentiateUndifferentiated          |  1.8983208 | 0.5566714 |  3.4101279 | 0.0006493 |
-| a_stageRegional                        | -0.0401504 | 0.2662370 | -0.1508068 | 0.8801281 |
-| tumor_size                             |  0.0002492 | 0.0039726 |  0.0627193 | 0.9499900 |
-| estrogen_statusPositive                | -0.7418514 | 0.1778875 | -4.1703414 | 0.0000304 |
-| progesterone_statusPositive            | -0.5860593 | 0.1276841 | -4.5899160 | 0.0000044 |
-| regional_node_examined                 | -0.0358800 | 0.0071869 | -4.9924273 | 0.0000006 |
-| reginol_node_positive                  |  0.0790803 | 0.0153636 |  5.1472588 | 0.0000003 |
+| term                                   | estimate | std.error | statistic | p.value |
+|:---------------------------------------|---------:|----------:|----------:|--------:|
+| (Intercept)                            |  -2.3128 |    0.5138 |   -4.5017 |  0.0000 |
+| age                                    |   0.0242 |    0.0056 |    4.3008 |  0.0000 |
+| raceOther                              |  -0.9235 |    0.2486 |   -3.7149 |  0.0002 |
+| raceWhite                              |  -0.5098 |    0.1618 |   -3.1504 |  0.0016 |
+| marital_statusMarried                  |  -0.2103 |    0.1418 |   -1.4832 |  0.1380 |
+| marital_statusSeparated                |   0.6718 |    0.3875 |    1.7338 |  0.0830 |
+| marital_statusSingle                   |  -0.0678 |    0.1751 |   -0.3871 |  0.6987 |
+| marital_statusWidowed                  |   0.0235 |    0.2210 |    0.1061 |  0.9155 |
+| t_stageT2                              |   0.2822 |    0.1954 |    1.4443 |  0.1487 |
+| t_stageT3                              |   0.5359 |    0.3138 |    1.7079 |  0.0876 |
+| t_stageT4                              |   0.9542 |    0.4501 |    2.1202 |  0.0340 |
+| n_stageN2                              |   0.6208 |    0.2392 |    2.5955 |  0.0094 |
+| n_stageN3                              |   0.6910 |    0.3007 |    2.2977 |  0.0216 |
+| x6th_stageIIB                          |   0.2143 |    0.2318 |    0.9245 |  0.3552 |
+| x6th_stageIIIA                         |  -0.0871 |    0.2950 |   -0.2954 |  0.7677 |
+| x6th_stageIIIB                         |   0.0887 |    0.5289 |    0.1677 |  0.8668 |
+| x6th_stageIIIC                         |       NA |        NA |        NA |      NA |
+| differentiateModerately differentiated |   0.5368 |    0.1841 |    2.9159 |  0.0035 |
+| differentiatePoorly differentiated     |   0.9252 |    0.1929 |    4.7974 |  0.0000 |
+| differentiateUndifferentiated          |   1.8983 |    0.5567 |    3.4101 |  0.0006 |
+| a_stageRegional                        |  -0.0402 |    0.2662 |   -0.1508 |  0.8801 |
+| tumor_size                             |   0.0002 |    0.0040 |    0.0627 |  0.9500 |
+| estrogen_statusPositive                |  -0.7419 |    0.1779 |   -4.1703 |  0.0000 |
+| progesterone_statusPositive            |  -0.5861 |    0.1277 |   -4.5899 |  0.0000 |
+| regional_node_examined                 |  -0.0359 |    0.0072 |   -4.9924 |  0.0000 |
+| reginol_node_positive                  |   0.0791 |    0.0154 |    5.1473 |  0.0000 |
 
 #### Backward Elimination
 
@@ -667,144 +667,64 @@ backward_glm = MASS::stepAIC(full_glm, direction = "backward", trace = FALSE)
 
 backward_glm %>% 
   broom::tidy() %>% 
-  knitr::kable()
+  knitr::kable(digits = 4)
 ```
 
-| term                                   |   estimate | std.error |  statistic |   p.value |
-|:---------------------------------------|-----------:|----------:|-----------:|----------:|
-| (Intercept)                            | -2.2838315 | 0.4384836 | -5.2084769 | 0.0000002 |
-| age                                    |  0.0238007 | 0.0056100 |  4.2425819 | 0.0000221 |
-| raceOther                              | -0.9345816 | 0.2484557 | -3.7615615 | 0.0001689 |
-| raceWhite                              | -0.5148243 | 0.1616638 | -3.1845366 | 0.0014499 |
-| marital_statusMarried                  | -0.2110346 | 0.1416356 | -1.4899823 | 0.1362289 |
-| marital_statusSeparated                |  0.6691400 | 0.3881385 |  1.7239720 | 0.0847129 |
-| marital_statusSingle                   | -0.0646133 | 0.1748158 | -0.3696077 | 0.7116748 |
-| marital_statusWidowed                  |  0.0174933 | 0.2210705 |  0.0791300 | 0.9369292 |
-| t_stageT2                              |  0.4111129 | 0.1130295 |  3.6372161 | 0.0002756 |
-| t_stageT3                              |  0.5515947 | 0.1487720 |  3.7076523 | 0.0002092 |
-| t_stageT4                              |  1.0987803 | 0.2445294 |  4.4934479 | 0.0000070 |
-| n_stageN2                              |  0.4362925 | 0.1283709 |  3.3986873 | 0.0006771 |
-| n_stageN3                              |  0.5871676 | 0.2345455 |  2.5034268 | 0.0122997 |
-| differentiateModerately differentiated |  0.5327601 | 0.1837768 |  2.8989515 | 0.0037441 |
-| differentiatePoorly differentiated     |  0.9190270 | 0.1923771 |  4.7772156 | 0.0000018 |
-| differentiateUndifferentiated          |  1.8648633 | 0.5538330 |  3.3671943 | 0.0007594 |
-| estrogen_statusPositive                | -0.7480166 | 0.1775063 | -4.2140275 | 0.0000251 |
-| progesterone_statusPositive            | -0.5841584 | 0.1275160 | -4.5810602 | 0.0000046 |
-| regional_node_examined                 | -0.0359376 | 0.0071717 | -5.0110048 | 0.0000005 |
-| reginol_node_positive                  |  0.0796837 | 0.0153014 |  5.2075987 | 0.0000002 |
+| term                                   | estimate | std.error | statistic | p.value |
+|:---------------------------------------|---------:|----------:|----------:|--------:|
+| (Intercept)                            |  -2.2838 |    0.4385 |   -5.2085 |  0.0000 |
+| age                                    |   0.0238 |    0.0056 |    4.2426 |  0.0000 |
+| raceOther                              |  -0.9346 |    0.2485 |   -3.7616 |  0.0002 |
+| raceWhite                              |  -0.5148 |    0.1617 |   -3.1845 |  0.0014 |
+| marital_statusMarried                  |  -0.2110 |    0.1416 |   -1.4900 |  0.1362 |
+| marital_statusSeparated                |   0.6691 |    0.3881 |    1.7240 |  0.0847 |
+| marital_statusSingle                   |  -0.0646 |    0.1748 |   -0.3696 |  0.7117 |
+| marital_statusWidowed                  |   0.0175 |    0.2211 |    0.0791 |  0.9369 |
+| t_stageT2                              |   0.4111 |    0.1130 |    3.6372 |  0.0003 |
+| t_stageT3                              |   0.5516 |    0.1488 |    3.7077 |  0.0002 |
+| t_stageT4                              |   1.0988 |    0.2445 |    4.4934 |  0.0000 |
+| n_stageN2                              |   0.4363 |    0.1284 |    3.3987 |  0.0007 |
+| n_stageN3                              |   0.5872 |    0.2345 |    2.5034 |  0.0123 |
+| differentiateModerately differentiated |   0.5328 |    0.1838 |    2.8990 |  0.0037 |
+| differentiatePoorly differentiated     |   0.9190 |    0.1924 |    4.7772 |  0.0000 |
+| differentiateUndifferentiated          |   1.8649 |    0.5538 |    3.3672 |  0.0008 |
+| estrogen_statusPositive                |  -0.7480 |    0.1775 |   -4.2140 |  0.0000 |
+| progesterone_statusPositive            |  -0.5842 |    0.1275 |   -4.5811 |  0.0000 |
+| regional_node_examined                 |  -0.0359 |    0.0072 |   -5.0110 |  0.0000 |
+| reginol_node_positive                  |   0.0797 |    0.0153 |    5.2076 |  0.0000 |
 
 #### Stepwise Regression
 
 ``` r
-stepwise_glm = step(full_glm)
-```
+stepwise_glm = MASS::stepAIC(full_glm, direction = "both", trace = FALSE)
 
-    ## Start:  AIC=3002
-    ## status ~ age + race + marital_status + t_stage + n_stage + x6th_stage + 
-    ##     differentiate + a_stage + tumor_size + estrogen_status + 
-    ##     progesterone_status + regional_node_examined + reginol_node_positive
-    ## 
-    ##                          Df Deviance    AIC
-    ## - x6th_stage              3   2953.7 2997.7
-    ## - tumor_size              1   2952.0 3000.0
-    ## - a_stage                 1   2952.0 3000.0
-    ## - t_stage                 3   2957.2 3001.2
-    ## <none>                        2952.0 3002.0
-    ## - marital_status          4   2960.1 3002.1
-    ## - n_stage                 1   2958.9 3006.9
-    ## - race                    2   2967.1 3013.1
-    ## - estrogen_status         1   2969.2 3017.2
-    ## - age                     1   2970.8 3018.8
-    ## - progesterone_status     1   2972.0 3020.0
-    ## - regional_node_examined  1   2978.7 3026.7
-    ## - reginol_node_positive   1   2978.8 3026.8
-    ## - differentiate           3   2986.0 3030.0
-    ## 
-    ## Step:  AIC=2997.73
-    ## status ~ age + race + marital_status + t_stage + n_stage + differentiate + 
-    ##     a_stage + tumor_size + estrogen_status + progesterone_status + 
-    ##     regional_node_examined + reginol_node_positive
-    ## 
-    ##                          Df Deviance    AIC
-    ## - tumor_size              1   2953.8 2995.8
-    ## - a_stage                 1   2953.8 2995.8
-    ## <none>                        2953.7 2997.7
-    ## - marital_status          4   2961.7 2997.7
-    ## - n_stage                 2   2965.5 3005.5
-    ## - t_stage                 3   2968.8 3006.8
-    ## - race                    2   2969.2 3009.2
-    ## - estrogen_status         1   2971.2 3013.2
-    ## - age                     1   2972.1 3014.1
-    ## - progesterone_status     1   2973.6 3015.6
-    ## - regional_node_examined  1   2980.4 3022.4
-    ## - reginol_node_positive   1   2981.1 3023.1
-    ## - differentiate           3   2987.4 3025.4
-    ## 
-    ## Step:  AIC=2995.75
-    ## status ~ age + race + marital_status + t_stage + n_stage + differentiate + 
-    ##     a_stage + estrogen_status + progesterone_status + regional_node_examined + 
-    ##     reginol_node_positive
-    ## 
-    ##                          Df Deviance    AIC
-    ## - a_stage                 1   2953.8 2993.8
-    ## <none>                        2953.8 2995.8
-    ## - marital_status          4   2961.8 2995.8
-    ## - n_stage                 2   2965.7 3003.7
-    ## - race                    2   2969.2 3007.2
-    ## - estrogen_status         1   2971.2 3011.2
-    ## - age                     1   2972.1 3012.1
-    ## - progesterone_status     1   2973.7 3013.7
-    ## - t_stage                 3   2980.8 3016.8
-    ## - regional_node_examined  1   2980.6 3020.6
-    ## - reginol_node_positive   1   2981.1 3021.1
-    ## - differentiate           3   2987.4 3023.4
-    ## 
-    ## Step:  AIC=2993.77
-    ## status ~ age + race + marital_status + t_stage + n_stage + differentiate + 
-    ##     estrogen_status + progesterone_status + regional_node_examined + 
-    ##     reginol_node_positive
-    ## 
-    ##                          Df Deviance    AIC
-    ## <none>                        2953.8 2993.8
-    ## - marital_status          4   2961.8 2993.8
-    ## - n_stage                 2   2965.8 3001.8
-    ## - race                    2   2969.3 3005.3
-    ## - estrogen_status         1   2971.3 3009.3
-    ## - age                     1   2972.1 3010.1
-    ## - progesterone_status     1   2973.7 3011.7
-    ## - t_stage                 3   2982.7 3016.7
-    ## - regional_node_examined  1   2980.6 3018.6
-    ## - reginol_node_positive   1   2981.1 3019.1
-    ## - differentiate           3   2987.4 3021.4
-
-``` r
 stepwise_glm %>% 
   broom::tidy() %>% 
-  knitr::kable()
+  knitr::kable(digits = 4)
 ```
 
-| term                                   |   estimate | std.error |  statistic |   p.value |
-|:---------------------------------------|-----------:|----------:|-----------:|----------:|
-| (Intercept)                            | -2.2838315 | 0.4384836 | -5.2084769 | 0.0000002 |
-| age                                    |  0.0238007 | 0.0056100 |  4.2425819 | 0.0000221 |
-| raceOther                              | -0.9345816 | 0.2484557 | -3.7615615 | 0.0001689 |
-| raceWhite                              | -0.5148243 | 0.1616638 | -3.1845366 | 0.0014499 |
-| marital_statusMarried                  | -0.2110346 | 0.1416356 | -1.4899823 | 0.1362289 |
-| marital_statusSeparated                |  0.6691400 | 0.3881385 |  1.7239720 | 0.0847129 |
-| marital_statusSingle                   | -0.0646133 | 0.1748158 | -0.3696077 | 0.7116748 |
-| marital_statusWidowed                  |  0.0174933 | 0.2210705 |  0.0791300 | 0.9369292 |
-| t_stageT2                              |  0.4111129 | 0.1130295 |  3.6372161 | 0.0002756 |
-| t_stageT3                              |  0.5515947 | 0.1487720 |  3.7076523 | 0.0002092 |
-| t_stageT4                              |  1.0987803 | 0.2445294 |  4.4934479 | 0.0000070 |
-| n_stageN2                              |  0.4362925 | 0.1283709 |  3.3986873 | 0.0006771 |
-| n_stageN3                              |  0.5871676 | 0.2345455 |  2.5034268 | 0.0122997 |
-| differentiateModerately differentiated |  0.5327601 | 0.1837768 |  2.8989515 | 0.0037441 |
-| differentiatePoorly differentiated     |  0.9190270 | 0.1923771 |  4.7772156 | 0.0000018 |
-| differentiateUndifferentiated          |  1.8648633 | 0.5538330 |  3.3671943 | 0.0007594 |
-| estrogen_statusPositive                | -0.7480166 | 0.1775063 | -4.2140275 | 0.0000251 |
-| progesterone_statusPositive            | -0.5841584 | 0.1275160 | -4.5810602 | 0.0000046 |
-| regional_node_examined                 | -0.0359376 | 0.0071717 | -5.0110048 | 0.0000005 |
-| reginol_node_positive                  |  0.0796837 | 0.0153014 |  5.2075987 | 0.0000002 |
+| term                                   | estimate | std.error | statistic | p.value |
+|:---------------------------------------|---------:|----------:|----------:|--------:|
+| (Intercept)                            |  -2.2838 |    0.4385 |   -5.2085 |  0.0000 |
+| age                                    |   0.0238 |    0.0056 |    4.2426 |  0.0000 |
+| raceOther                              |  -0.9346 |    0.2485 |   -3.7616 |  0.0002 |
+| raceWhite                              |  -0.5148 |    0.1617 |   -3.1845 |  0.0014 |
+| marital_statusMarried                  |  -0.2110 |    0.1416 |   -1.4900 |  0.1362 |
+| marital_statusSeparated                |   0.6691 |    0.3881 |    1.7240 |  0.0847 |
+| marital_statusSingle                   |  -0.0646 |    0.1748 |   -0.3696 |  0.7117 |
+| marital_statusWidowed                  |   0.0175 |    0.2211 |    0.0791 |  0.9369 |
+| t_stageT2                              |   0.4111 |    0.1130 |    3.6372 |  0.0003 |
+| t_stageT3                              |   0.5516 |    0.1488 |    3.7077 |  0.0002 |
+| t_stageT4                              |   1.0988 |    0.2445 |    4.4934 |  0.0000 |
+| n_stageN2                              |   0.4363 |    0.1284 |    3.3987 |  0.0007 |
+| n_stageN3                              |   0.5872 |    0.2345 |    2.5034 |  0.0123 |
+| differentiateModerately differentiated |   0.5328 |    0.1838 |    2.8990 |  0.0037 |
+| differentiatePoorly differentiated     |   0.9190 |    0.1924 |    4.7772 |  0.0000 |
+| differentiateUndifferentiated          |   1.8649 |    0.5538 |    3.3672 |  0.0008 |
+| estrogen_statusPositive                |  -0.7480 |    0.1775 |   -4.2140 |  0.0000 |
+| progesterone_statusPositive            |  -0.5842 |    0.1275 |   -4.5811 |  0.0000 |
+| regional_node_examined                 |  -0.0359 |    0.0072 |   -5.0110 |  0.0000 |
+| reginol_node_positive                  |   0.0797 |    0.0153 |    5.2076 |  0.0000 |
 
 The backward and stepwise procedure produced the same model.
 
@@ -822,9 +742,8 @@ model_selection =
   unnest(result) %>%
   select(type, AIC, BIC)
 
-
 model_selection %>%
-  knitr::kable(digits = 3, caption = "Model Selection")
+  knitr::kable(digits = 4, caption = "Model Selection")
 ```
 
 | type     |      AIC |      BIC |
@@ -856,20 +775,22 @@ to be our “best model”.
 ### Model Diagnostics
 
 ``` r
-vif(final_glm)
+vif(final_glm) %>% 
+  knitr::kable(digits = 4)
 ```
 
-    ##                            GVIF Df GVIF^(1/(2*Df))
-    ## age                    1.107154  1        1.052214
-    ## race                   1.062865  2        1.015359
-    ## marital_status         1.129117  4        1.015295
-    ## t_stage                1.101923  3        1.016308
-    ## n_stage                3.806780  2        1.396817
-    ## differentiate          1.117097  3        1.018627
-    ## estrogen_status        1.475424  1        1.214670
-    ## progesterone_status    1.427536  1        1.194795
-    ## regional_node_examined 1.477809  1        1.215651
-    ## reginol_node_positive  4.248357  1        2.061154
+|                        |   GVIF |  Df | GVIF^(1/(2\*Df)) |
+|:-----------------------|-------:|----:|-----------------:|
+| age                    | 1.1072 |   1 |           1.0522 |
+| race                   | 1.0629 |   2 |           1.0154 |
+| marital_status         | 1.1291 |   4 |           1.0153 |
+| t_stage                | 1.1019 |   3 |           1.0163 |
+| n_stage                | 3.8068 |   2 |           1.3968 |
+| differentiate          | 1.1171 |   3 |           1.0186 |
+| estrogen_status        | 1.4754 |   1 |           1.2147 |
+| progesterone_status    | 1.4275 |   1 |           1.1948 |
+| regional_node_examined | 1.4778 |   1 |           1.2157 |
+| reginol_node_positive  | 4.2484 |   1 |           2.0612 |
 
 Variance Inflation Factor is a commonly used method for detecting
 multicollinearity in regression models. VIF is generally calculated for
@@ -937,31 +858,31 @@ final_glm_df =
   rename(p_value = pr_z)
 
 final_glm_df %>% 
-  knitr::kable()
+  knitr::kable(digits = 4)
 ```
 
-|                                        |   estimate | std_error |    z_value |   p_value | odds_ratio |
-|:---------------------------------------|-----------:|----------:|-----------:|----------:|-----------:|
-| (Intercept)                            | -2.2838315 | 0.4384836 | -5.2084769 | 0.0000002 |  0.1018931 |
-| age                                    |  0.0238007 | 0.0056100 |  4.2425819 | 0.0000221 |  1.0240862 |
-| raceOther                              | -0.9345816 | 0.2484557 | -3.7615615 | 0.0001689 |  0.3927502 |
-| raceWhite                              | -0.5148243 | 0.1616638 | -3.1845366 | 0.0014499 |  0.5976056 |
-| marital_statusMarried                  | -0.2110346 | 0.1416356 | -1.4899823 | 0.1362289 |  0.8097461 |
-| marital_statusSeparated                |  0.6691400 | 0.3881385 |  1.7239720 | 0.0847129 |  1.9525574 |
-| marital_statusSingle                   | -0.0646133 | 0.1748158 | -0.3696077 | 0.7116748 |  0.9374299 |
-| marital_statusWidowed                  |  0.0174933 | 0.2210705 |  0.0791300 | 0.9369292 |  1.0176472 |
-| t_stageT2                              |  0.4111129 | 0.1130295 |  3.6372161 | 0.0002756 |  1.5084956 |
-| t_stageT3                              |  0.5515947 | 0.1487720 |  3.7076523 | 0.0002092 |  1.7360193 |
-| t_stageT4                              |  1.0987803 | 0.2445294 |  4.4934479 | 0.0000070 |  3.0005041 |
-| n_stageN2                              |  0.4362925 | 0.1283709 |  3.3986873 | 0.0006771 |  1.5469611 |
-| n_stageN3                              |  0.5871676 | 0.2345455 |  2.5034268 | 0.0122997 |  1.7988859 |
-| differentiateModerately differentiated |  0.5327601 | 0.1837768 |  2.8989515 | 0.0037441 |  1.7036280 |
-| differentiatePoorly differentiated     |  0.9190270 | 0.1923771 |  4.7772156 | 0.0000018 |  2.5068500 |
-| differentiateUndifferentiated          |  1.8648633 | 0.5538330 |  3.3671943 | 0.0007594 |  6.4550535 |
-| estrogen_statusPositive                | -0.7480166 | 0.1775063 | -4.2140275 | 0.0000251 |  0.4733044 |
-| progesterone_statusPositive            | -0.5841584 | 0.1275160 | -4.5810602 | 0.0000046 |  0.5575749 |
-| regional_node_examined                 | -0.0359376 | 0.0071717 | -5.0110048 | 0.0000005 |  0.9647004 |
-| reginol_node_positive                  |  0.0796837 | 0.0153014 |  5.2075987 | 0.0000002 |  1.0829445 |
+|                                        | estimate | std_error | z_value | p_value | odds_ratio |
+|:---------------------------------------|---------:|----------:|--------:|--------:|-----------:|
+| (Intercept)                            |  -2.2838 |    0.4385 | -5.2085 |  0.0000 |     0.1019 |
+| age                                    |   0.0238 |    0.0056 |  4.2426 |  0.0000 |     1.0241 |
+| raceOther                              |  -0.9346 |    0.2485 | -3.7616 |  0.0002 |     0.3928 |
+| raceWhite                              |  -0.5148 |    0.1617 | -3.1845 |  0.0014 |     0.5976 |
+| marital_statusMarried                  |  -0.2110 |    0.1416 | -1.4900 |  0.1362 |     0.8097 |
+| marital_statusSeparated                |   0.6691 |    0.3881 |  1.7240 |  0.0847 |     1.9526 |
+| marital_statusSingle                   |  -0.0646 |    0.1748 | -0.3696 |  0.7117 |     0.9374 |
+| marital_statusWidowed                  |   0.0175 |    0.2211 |  0.0791 |  0.9369 |     1.0176 |
+| t_stageT2                              |   0.4111 |    0.1130 |  3.6372 |  0.0003 |     1.5085 |
+| t_stageT3                              |   0.5516 |    0.1488 |  3.7077 |  0.0002 |     1.7360 |
+| t_stageT4                              |   1.0988 |    0.2445 |  4.4934 |  0.0000 |     3.0005 |
+| n_stageN2                              |   0.4363 |    0.1284 |  3.3987 |  0.0007 |     1.5470 |
+| n_stageN3                              |   0.5872 |    0.2345 |  2.5034 |  0.0123 |     1.7989 |
+| differentiateModerately differentiated |   0.5328 |    0.1838 |  2.8990 |  0.0037 |     1.7036 |
+| differentiatePoorly differentiated     |   0.9190 |    0.1924 |  4.7772 |  0.0000 |     2.5069 |
+| differentiateUndifferentiated          |   1.8649 |    0.5538 |  3.3672 |  0.0008 |     6.4551 |
+| estrogen_statusPositive                |  -0.7480 |    0.1775 | -4.2140 |  0.0000 |     0.4733 |
+| progesterone_statusPositive            |  -0.5842 |    0.1275 | -4.5811 |  0.0000 |     0.5576 |
+| regional_node_examined                 |  -0.0359 |    0.0072 | -5.0110 |  0.0000 |     0.9647 |
+| reginol_node_positive                  |   0.0797 |    0.0153 |  5.2076 |  0.0000 |     1.0829 |
 
 ### Cross Validation
 
@@ -984,22 +905,10 @@ glm_fit = function(data) {
 }
 
 cv_df = 
-  crossv_kfold(survival_df, k = 5) |>
+  crossv_kfold(survival_df, k = 10) |>
   mutate(
     train = map(train, as_tibble),
     test = map(test, as_tibble)
-  )
-
-
-cv_res_df = 
-  cv_df |>
-  mutate(
-    final_model = map(train, \(x) glm_fit(data = x)),
-    log_loss = map2_dbl(final_model, test, \(model, test_data) {
-      predicted_probs = predict(model, newdata = test_data, type = "response")
-      actual_outcomes = test_data$status
-      log_loss(actual_outcomes, predicted_probs)
-    })
   )
 
 cv_res_df = 
@@ -1010,40 +919,145 @@ cv_res_df =
                                predict(fit, newdata = data, type = "response")),
     actual_outcomes = map(test, pull, status),
     log_loss = map2_dbl(actual_outcomes, predicted_probs, \(x, y) log_loss(x, y)),
-    auc = map2_dbl(actual_outcomes, predicted_probs, \(x, y) {
+    AUC = map2_dbl(actual_outcomes, predicted_probs, \(x, y) {
       roc_obj = roc(x, y)  
       auc(roc_obj)  
     })
   )
 
 cv_res_df %>% 
-  select(log_loss, auc)
+  select(log_loss, AUC) %>% 
+  knitr::kable(digits = 4)
 ```
 
-    ## # A tibble: 5 × 2
-    ##   log_loss   auc
-    ##      <dbl> <dbl>
-    ## 1    0.373 0.720
-    ## 2    0.365 0.708
-    ## 3    0.385 0.773
-    ## 4    0.371 0.764
-    ## 5    0.364 0.763
+| log_loss |    AUC |
+|---------:|-------:|
+|   0.3681 | 0.6999 |
+|   0.3639 | 0.7463 |
+|   0.4069 | 0.7498 |
+|   0.3773 | 0.7552 |
+|   0.3575 | 0.7792 |
+|   0.3780 | 0.7317 |
+|   0.3679 | 0.6604 |
+|   0.3636 | 0.7951 |
+|   0.3681 | 0.7644 |
+|   0.3718 | 0.7405 |
 
-``` r
-CV_log_loss = mean(cv_res_df$log_loss)
-CV_log_loss
-```
+After applying 10-fold cross-validation, we evaluate the goodness of fit
+by log loss and AUC. The mean of log loss is 0.3723182, and the mean of
+AUC is 0.7422428.
 
-    ## [1] 0.371593
-
-Since the CV_log_loss is very small, the model is a good fit by cross
-validation.
+### Evaluation Across Races
 
 - Evaluate the performance of your model(s). Is your model achieving
   similar performance between the majority race group “White” and the
   minority “Black” (or “Black” + “Other”)? If not, could you try to
   improve the fairness (i.e., reducing the gap of prediction performance
   between the majority and minority) of your model(s)?
+
+``` r
+eval_produce = function(model, df) {
+  
+  results = 
+    df %>% 
+    mutate(predicted_probs = predict(model, newdata = ., type = "response")) %>% 
+    group_by(race) %>% 
+    summarize(
+      log_loss = log_loss(status, predicted_probs),
+      AUC = {
+        roc_obj = roc(status, predicted_probs)
+        auc_value = auc(roc_obj)  # Extract the numeric value of AUC
+        as.numeric(auc_value)
+        }
+      ) %>% 
+    ungroup() %>% 
+    select(race, log_loss, AUC)
+  
+  return(results)
+  
+}
+
+stra_cv_df = 
+  survival_df %>%
+  mutate(
+    race = fct_collapse(
+      race,
+      "Black or other" = c("Black", "Other")  
+    )
+  ) %>% 
+  vfold_cv(v = 10, strata = race) %>% 
+  mutate(
+    train = map(splits, training),
+    test = map(splits, testing)
+  )
+
+stra_res_df = 
+  stra_cv_df %>% 
+  mutate(
+    final_model = map(train, \(x) glm_fit(data = x)),
+    results = map2(final_model, test, \(x, y) eval_produce(x, y))
+  )
+
+stra_res_df %>% 
+  select(results) %>% 
+  unnest(cols = c(results)) %>% 
+  group_by(race) %>%
+  summarise(
+    avg_log_loss = mean(log_loss),
+    avg_AUC = mean(AUC)
+  ) %>% 
+  knitr::kable(digits = 4)
+```
+
+| race           | avg_log_loss | avg_AUC |
+|:---------------|-------------:|--------:|
+| Black or other |       0.4231 |  0.6997 |
+| White          |       0.3651 |  0.7502 |
+
+Low log loss and high AUC indicate better test performance.
+
+To reduce the gap of prediction performance between the majority and
+minority, we can try to add an interaction term in the model.
+
+``` r
+glm_inter_fit = function(data) {
+  
+  fit = glm(formula = status ~ age + race + marital_status + t_stage + n_stage + 
+        differentiate + estrogen_status + progesterone_status + 
+        regional_node_examined + reginol_node_positive + age * race + marital_status * race, 
+        family = binomial, data = data)
+  
+  return(fit)
+  
+}
+
+inter_res_df = 
+  stra_cv_df %>% 
+  mutate(
+    final_model = map(train, \(x) glm_inter_fit(data = x)),
+    results = map2(final_model, test, \(x, y) eval_produce(x, y))
+  ) 
+
+inter_res_df %>% 
+  select(results) %>% 
+  unnest(cols = c(results)) %>% 
+  group_by(race) %>%
+  summarise(
+    avg_log_loss = mean(log_loss),
+    avg_AUC = mean(AUC)
+  ) %>% 
+  knitr::kable(digits = 4)
+```
+
+| race           | avg_log_loss | avg_AUC |
+|:---------------|-------------:|--------:|
+| Black or other |       0.4204 |  0.7220 |
+| White          |       0.3648 |  0.7501 |
+
+By adding interaction term `age * race` and `marital_status * race`, we
+can observe a decrease in log loss and an increase in AUC, which means
+an improve in the fairness between group “White” and the minority
+“Black” + “Other”.
 
 ## Survival Analysis
 
@@ -1053,6 +1067,9 @@ surv_obj = Surv(time = survival_df$survival_months, event = survival_df$status)
 
 ### Kaplan Meier Curve
 
+The Kaplan Meier curve graphically represent the survival rate. Time is
+plotted on the x-axis and the survival rate is plotted on the y-axis.
+
 ``` r
 km_fit = survfit(surv_obj ~ 1, data = survival_df)
 
@@ -1061,13 +1078,46 @@ ggsurvfit(km_fit, type = "survival", linewidth = 1) +
        y = "Overall survival",
        title = "Kaplan-Meier Survival Curve") +
   add_confidence_interval() +
-  add_risktable() +
   scale_ggsurvfit()
 ```
 
 <img src="P8130_final_project_files/figure-gfm/km_curve-1.png" width="90%" />
 
-### Cox Regression
+### Log Rank Test
+
+The log rank test lets us test whether there is a difference in survival
+times between groups of patients. For example, we want to find out
+whether there is a significant difference in survival between patients
+whose cells have different degrees of differentiation.
+
+``` r
+log_rank_fit = survfit(surv_obj ~ differentiate, data = survival_df)
+
+
+log_rank_plot = 
+  ggsurvplot(log_rank_fit, data = survival_df,
+           size = 1, palette = "RdBu",
+           censor.shape = '|', censor.size = 2,
+           conf.int = TRUE, pval = TRUE,
+           ggtheme = theme_bw(),
+           legend = "bottom",
+           legend.title = "Legend",
+           legend.labs = c("Well differentiated", "Moderately differentiated",
+                           "Poorly differentiated", "Undifferentiated"))
+
+log_rank_plot$plot +
+  ggtitle("Survival Time Across Differentiated Stages") +
+  guides(color = guide_legend(nrow = 2))
+```
+
+<img src="P8130_final_project_files/figure-gfm/log_rank-1.png" width="90%" />
+
+### Cox Model
+
+The limitation of KM curves and log-rank tests is that we can only test
+one variable at a time. To further discuss the risk factors to survival
+time, we will compute the cox proportional hazard model to adjusts for
+multiple risk factors simultaneously.
 
 ``` r
 cox_model = coxph(surv_obj ~ 
@@ -1075,32 +1125,95 @@ cox_model = coxph(surv_obj ~
                        differentiate + a_stage + tumor_size + estrogen_status +
                        progesterone_status + regional_node_examined + reginol_node_positive, 
                   data = as.data.frame(survival_df))
-cox.zph(cox_model)
 ```
 
-    ##                          chisq df       p
-    ## age                     0.1328  1 0.71556
-    ## race                    0.9335  2 0.62702
-    ## marital_status          2.6670  4 0.61500
-    ## t_stage                 0.2144  3 0.97523
-    ## n_stage                 1.7178  2 0.42362
-    ## x6th_stage              3.8545  3 0.27761
-    ## differentiate           1.8899  3 0.59557
-    ## a_stage                 5.2218  1 0.02231
-    ## tumor_size              0.9310  1 0.33460
-    ## estrogen_status        28.9294  1 7.5e-08
-    ## progesterone_status    32.1281  1 1.4e-08
-    ## regional_node_examined  0.0187  1 0.89124
-    ## reginol_node_positive   0.0324  1 0.85707
-    ## GLOBAL                 57.2155 24 0.00016
+The cox proportional hazard model has a assumption: the survival curves
+for two different strata of a risk factor must have hazard functions
+that are proportional over time. This assumption is satisfied when the
+change in hazard from one category to the next does not depend on time.
+That is, a person in one stratum has the same instantaneous relative
+risk compared to a person in a different stratum, irrespective of how
+much time has passed.
+
+We will test this assumption based on the scaled Schoenfeld residuals.
+Here is an interpretation of the results: When p-val \< 0.05, there is
+evidence against the proportional hazards assumption, meaning that the
+HR is not constant over time. Similarly, the larger the chi-square
+value, the greater the violation of the assumption.
 
 ``` r
-ggforest(cox_model)
+cox.zph(cox_model) %>%
+  .$table %>%
+  as.data.frame() %>% 
+  knitr::kable(digits = 4)
 ```
 
-<img src="P8130_final_project_files/figure-gfm/forest_plot-1.png" width="90%" />
+|                        |   chisq |  df |      p |
+|:-----------------------|--------:|----:|-------:|
+| age                    |  0.1328 |   1 | 0.7156 |
+| race                   |  0.9335 |   2 | 0.6270 |
+| marital_status         |  2.6670 |   4 | 0.6150 |
+| t_stage                |  0.2144 |   3 | 0.9752 |
+| n_stage                |  1.7178 |   2 | 0.4236 |
+| x6th_stage             |  3.8545 |   3 | 0.2776 |
+| differentiate          |  1.8899 |   3 | 0.5956 |
+| a_stage                |  5.2218 |   1 | 0.0223 |
+| tumor_size             |  0.9310 |   1 | 0.3346 |
+| estrogen_status        | 28.9294 |   1 | 0.0000 |
+| progesterone_status    | 32.1281 |   1 | 0.0000 |
+| regional_node_examined |  0.0187 |   1 | 0.8912 |
+| reginol_node_positive  |  0.0324 |   1 | 0.8571 |
+| GLOBAL                 | 57.2155 |  24 | 0.0002 |
 
-The x-axis of this forest plot represents hazard ratios. HR = 1 means no
-significant difference compared to the reference, and a HR higher than 1
-means it increases the hazard ratio of the event, death, and a HR lower
-than 1 decreases it.
+We can see from the table that variable `a_stage`, `estrogen_status`,
+`progesterone_status` are not constant over time, which means it’s not
+proper to contain these covariates in cox regression. To reduce bias of
+the model, we can remove these variables and take a closer look at the
+result.
+
+``` r
+cox_new_model = coxph(surv_obj ~ age + race + marital_status + t_stage + n_stage + x6th_stage +
+                      differentiate + tumor_size + regional_node_examined + reginol_node_positive,
+                    data = as.data.frame(survival_df))
+
+ggforest(cox_new_model,
+         fontsize = 0.6)
+```
+
+<img src="P8130_final_project_files/figure-gfm/forest_plot-1.png" width="100%" />
+
+The hazard ratio is similar to relative risk, but differs in that the HR
+is the instantaneous risk rather than the cumulative risk over the
+entire study.
+
+The x-axis of this forest plot represents hazard ratios. Hazard ratio =
+1 means no significant difference compared to the reference, and a HR
+higher than 1 means it increases the hazard ratio of the event, death,
+and a HR lower than 1 decreases it. The smaller the p-value is the
+stronger the weight of evidence that the two groups are different.
+
+We can conclude from the plot that for the variable race, blacks have
+the highest risk of death, followed by whites, while the lowest
+mortality rate is for other ethnic groups. In the variable marital
+status, the risk of death is significantly higher for separated people,
+but this may be due to information bias caused by fewer observations.
+The confidence intervals for the other categories of marital status all
+contain the null hypothesis, meaning that there is no significant
+difference.
+
+The risk of death is highest for patients with N stage N3, followed by
+N2, and finally N1. Differently, although T stage also shows a similar
+trend, the confidence intervals of each stage level contain the null
+hypothesis, meaning that there is no significant difference between
+levels. For the 6th stage, IIIB has the highest risk of death, followed
+by IIB, and then IIA, but there is no significant difference. For stage
+IIIC, since it contains the same information as N3 of N stage, no
+comparison is made in this variable.
+
+In the variable differentiated, the risk of death is significantly
+highest for undifferentiated, and then decreases in the order of poorly
+differentiated, moderately differentiated, and well differentiated.
+
+For the variables tumor size, regional node examined, and reginol node
+postive, we did not observe significant differences in the risk of
+death.
