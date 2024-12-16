@@ -2,25 +2,36 @@
 title: "P8130_final_project"
 author: "Leonor Rui"
 date: "2024-12-03"
-output: pdf_document
-editor_options: 
+output:
+  github_document
+editor_options:
   chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 library(tidyverse)
 library(ggplot2)
-library(dplyr)
 library(car)
 library(leaps)
 library(lmtest)
 library(regressinator)
 library(broom)
 library(modelr)
+library(pROC)
 library(survival)
+library(ggsurvfit)
 library(survminer)
 set.seed(11)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%",
+  warning = FALSE,
+  message = FALSE
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
 ```
 
 # Appendix
@@ -62,6 +73,13 @@ survival_df = survival_df |>
     estrogen_status = factor(estrogen_status),
     progesterone_status = factor(progesterone_status),
     status = factor(status)
+  ) |>
+  mutate(
+    differentiate = factor(differentiate, levels = c("Well differentiated", 
+                                                     "Moderately differentiated",
+                                                     "Poorly differentiated",
+                                                     "Undifferentiated")),
+    differentiate = relevel(differentiate, ref = "Well differentiated")
   )
 ```
 
@@ -117,7 +135,7 @@ This table shows the frequency of different levels of `status` by 6th stage.
 
 # Distributions of the numeric variables
 
-## Distribution of age
+## Age
 
 ```{r}
 survival_df |> 
@@ -133,7 +151,7 @@ survival_df |>
 
 The histogram shows the age distribution of patients. Most patients are aged between 40 and 70 years. The data is well spread across middle and older age groups, making it possible for age-related analysis. Therefore, age will likely be a significant predictor for later analysis.
 
-## Distribution of tumor size
+## Tumor size
 
 ```{r}
 ggplot(survival_df, aes(x = tumor_size)) +
@@ -148,7 +166,7 @@ ggplot(survival_df, aes(x = tumor_size)) +
 
 This is the distribution of all tumor sizes, and most of the tumor sizes are smaller than 50 mm. We can find that the most frequent size is around 19 mm, followed by around 14 mm. This distribution is right-skewed, so we will use the log transformation for this variable.
 
-## Distribution of examined regional node
+## Examined regional node
 
 ```{r}
 ggplot(survival_df, aes(x = regional_node_examined)) +
@@ -163,7 +181,7 @@ ggplot(survival_df, aes(x = regional_node_examined)) +
 
 This plot maps the frequency of different number of examined regional nodes for each subject. The number of examined regional nodes for most subjects are smaller than 30, and the subjects with nearly 12 examined regional nodes are the most.
 
-## Distribution of positive regional node
+## Positive regional node
 
 ```{r}
 ggplot(survival_df, aes(x = reginol_node_positive)) +
@@ -178,7 +196,7 @@ ggplot(survival_df, aes(x = reginol_node_positive)) +
 
 Then is the distribution of different number of positive reginol node for each subject. Over 2500 subjects only have 1 or 2 positive reginol nodes, which is the most frequent number of positive reginol nodes. It is strongly right-skewed, so we will use the log transformation for this variable.
 
-## Distribution of Cancer Grades
+## Cancer Grades
 
 ```{r}
 ggplot(survival_df, aes(x = grade)) +
@@ -197,7 +215,7 @@ This bar chart provides an overview of how cancer cases are distributed across g
 # Bewteen Variables 
 
 
-## Distribution of survival months by status
+## Survival months by status
 
 ```{r}
 ggplot(survival_df, aes(x = survival_months, fill = status)) +
@@ -212,7 +230,7 @@ The Dead group is concentrated in the shorter survival months, while the Alive g
 
 
 
-## The distribution of the tumor sizes by t_stage
+## Tumor sizes by t_stage
 
 ```{r}
 ggplot(survival_df, aes(x = tumor_size, y = t_stage)) +
@@ -227,7 +245,7 @@ ggplot(survival_df, aes(x = tumor_size, y = t_stage)) +
 
 In this plot, we explore the tumor size distribution at different T stages. From T1 to T3, as the stage changes, both the mean tumor sizes and IQR become larger. At T4 stage, the IQR of tumor sizes is much larger than others, and the mean size is smaller than the mean size at T3 stage. There are some outliers both ar T1 stage and T3 stage.
 
-## The distribution of survival months by a_stage based on status(alive/dead)
+## Survival months by a_stage based on status(alive/dead)
 
 ```{r}
 ggplot(survival_df, aes(x = survival_months, y = a_stage)) +
@@ -243,7 +261,7 @@ ggplot(survival_df, aes(x = survival_months, y = a_stage)) +
 
 Through this plot, we can find that subjects with Distant stage have fewer survival months than subjects with Regional stage. However, the IQR of the survival months of subjects with Distant stage is much larger than subjects with Regional stage.
 
-## Distribution of Estrogen Status by Tumor Size Based on race
+## Estrogen Status by Tumor Size Based on race
 
 ```{r}
 ggplot(survival_df, aes(x = progesterone_status, y = tumor_size)) +
@@ -258,7 +276,7 @@ ggplot(survival_df, aes(x = progesterone_status, y = tumor_size)) +
 
 While the overall patterns are consistent, with Negative estrogen status generally associated with slightly larger tumor sizes, the variability and prevalence of outliers differ between groups. The White group shows the greatest spread in tumor size, while the Other group displays the least variability.
 
-## Tumor Size Distribution by Grade
+## Tumor Size by Grade
 
 ```{r}
 ggplot(survival_df, aes(x = grade, y = tumor_size)) +
@@ -393,12 +411,48 @@ survival_df |>
 
 # Model Building
 
+## Preparation
+
+```{r}
+full_glm = glm(status ~ age + race + marital_status + t_stage + n_stage + x6th_stage +
+                 differentiate + grade + a_stage + tumor_size + estrogen_status +
+                 progesterone_status + regional_node_examined + reginol_node_positive, 
+               data = survival_df, family = binomial)
+
+alias(full_glm)$Complete %>%
+  as.data.frame() %>%  
+  rownames_to_column("aliased_variables") %>% 
+  as.tibble() %>% 
+  pivot_longer(
+    cols = -aliased_variables,
+    names_to = "aliased_with", 
+    values_to = "value"
+  ) %>% 
+  filter(value != 0) %>% 
+  select(-value)
+```
+
+First, we use variables 1-14 to build a logistic regression. In this full model, we observe that the number of each level in the variable `grade` is the same as the variable `differentiate`, and the number of level `IIIC` in the variable `x6th_stage` is exactly the same with level `N3` in the variable `n_stage`.
+
+By looking up the relevant information on the staging system for breast cancer, we can see that the breast cancer grade (i.e. variable `grade`) is based on how much the cancer cells look like normal cells, which is highly similar to the meaning of the variable `differentiate`. Therefore, the variable `grade` can be removed from the model.
+
+In addition, the AJCC system (variable `x6th_stage`) is based on 7 aspects: the extent (size) of the tumor (T), the spread to nearby lymph nodes (N), the spread (metastasis) to distant sites (M), Estrogen Receptor (ER) status, Progesterone Receptor (PR) status, HER2 status and grade of the cancer (G). It can be seen that some of the evaluation criteria are already included in other variables. 
+
+However, since the AJCC system is complex and levels other than `IIIC` do not correlate with other variables, we cannot simply remove this variable from the model. We will discuss this variable further when it comes to this.
+
 ## Logistic Regression Model
 
 Adjusted R^2 increases as predictor number increases, but need to simplify the model. 
 
 ```{r}
-subsets = regsubsets(status ~ age + race + marital_status + t_stage + n_stage + x6th_stage + differentiate + grade + a_stage + tumor_size + estrogen_status + progesterone_status + regional_node_examined + reginol_node_positive, data = survival_df, nbest = 1)
+survival_df = 
+  survival_df |>
+  mutate(status = if_else(status == "Dead", 1, 0))
+
+subsets = regsubsets(status ~ age + race + marital_status + t_stage + n_stage + x6th_stage +
+                       differentiate + grade + a_stage + tumor_size + estrogen_status +
+                       progesterone_status + regional_node_examined + reginol_node_positive, 
+                     data = survival_df, nbest = 1)
 subset_summary = summary(subsets)
 
 plot(subset_summary$adjr2, type = "b", 
@@ -409,16 +463,28 @@ plot(subset_summary$adjr2, type = "b",
 Automated procedure
 
 ```{r}
-full_glm = glm(status ~ age + race + marital_status + t_stage + n_stage + x6th_stage + differentiate + grade + a_stage + tumor_size + estrogen_status + progesterone_status + regional_node_examined + reginol_node_positive, data = survival_df, family = binomial)
+full_glm = glm(status ~ age + race + marital_status + t_stage + n_stage + x6th_stage +
+                 differentiate + a_stage + tumor_size + estrogen_status +
+                 progesterone_status + regional_node_examined + reginol_node_positive, 
+               data = survival_df, family = binomial)
 
 step(full_glm)
 
-automated_glm = glm(formula = status ~ age + race + marital_status + t_stage + n_stage + differentiate + estrogen_status + progesterone_status + regional_node_examined + reginol_node_positive, family = binomial, data = survival_df)
+automated_glm = glm(formula = status ~ age + race + marital_status + t_stage + n_stage +
+                      differentiate + estrogen_status + progesterone_status +
+                      regional_node_examined + reginol_node_positive, 
+                    family = binomial, data = survival_df)
 
 summary(automated_glm)
 
 vif(automated_glm)
 ```
+
+Variance Inflation Factor is a commonly used method for detecting multicollinearity in regression models. VIF is generally calculated for the continuous variables, and Generalized Variance Inflation Factor (GVIF) is used for evaluating the multicollinearity for categorical variables.
+
+The adjusted GVIF (i.e. GVIF^(1/(2*Df))) values are corrected for the degree of freedom and provide a scale similar to VIF. The high adjusted GVIF values (GVIF > 2) indicate the presence of moderate to strong multicollinearity.
+
+The table shows that most variables do not show multicollinearity, with the exception of `reginol_node_positive`. Since its adjusted GVIF is not much different from 2, we will keep this variable for now.
 
 ### Model Diagnostics
 
@@ -454,14 +520,15 @@ lrtest(automated_glm, full_glm)
 final_glm = automated_glm
 ```
 
-According to the likelihood ratio test, he full model is not significantly more effective in predicting survival status than the automated model, so we will use the automated model as the final logistic model. 
+According to the likelihood ratio test, the full model is not significantly more effective in predicting survival status than the automated model, so we will use the automated model as the final logistic model. 
 
 ### Odds Ratios
 
 ```{r}
 final_glm_summary = summary(final_glm)
 
-final_glm_df = as.data.frame(final_glm_summary$coefficients) |>
+final_glm_df = 
+  as.data.frame(final_glm_summary$coefficients) |>
   janitor::clean_names() |>
   mutate(
     odds_ratio = exp(estimate)
@@ -475,11 +542,21 @@ final_glm_df
 
 ```{r}
 log_loss = function(actual, predicted) {
+  
   -mean(actual * log(predicted) + (1 - actual) * log(1 - predicted))
+  
 }
 
-survival_df = survival_df |>
-   mutate(status = if_else(status == "dead", 0, 1))
+glm_fit = function(data) {
+  
+  fit = glm(formula = status ~ age + race + marital_status + t_stage + n_stage + 
+        differentiate + estrogen_status + progesterone_status + 
+        regional_node_examined + reginol_node_positive, 
+        family = binomial, data = data)
+  
+  return(fit)
+  
+}
 
 cv_df = 
   crossv_kfold(survival_df, k = 5) |>
@@ -488,10 +565,11 @@ cv_df =
     test = map(test, as_tibble)
   )
 
+
 cv_res_df = 
   cv_df |>
   mutate(
-    final_model = map(train, \(x) glm(formula = status ~ age + race + marital_status + t_stage + n_stage + differentiate + estrogen_status + progesterone_status + regional_node_examined + reginol_node_positive, family = binomial, data = survival_df)),
+    final_model = map(train, \(x) glm_fit(data = x)),
     log_loss = map2_dbl(final_model, test, \(model, test_data) {
       predicted_probs = predict(model, newdata = test_data, type = "response")
       actual_outcomes = test_data$status
@@ -499,34 +577,71 @@ cv_res_df =
     })
   )
 
+cv_res_df = 
+  cv_df |>
+  mutate(
+    final_model = map(train, \(x) glm_fit(data = x)),
+    predicted_probs = map2(final_model, test, \(fit, data)
+                               predict(fit, newdata = data, type = "response")),
+    actual_outcomes = map(test, pull, status),
+    log_loss = map2_dbl(actual_outcomes, predicted_probs, \(x, y) log_loss(x, y)),
+    auc = map2_dbl(actual_outcomes, predicted_probs, \(x, y) {
+      roc_obj = roc(x, y)  
+      auc(roc_obj)  
+    })
+  )
+
+cv_res_df %>% 
+  select(log_loss, auc)
+
 CV_log_loss = mean(cv_res_df$log_loss)
 CV_log_loss
+
 ```
 
 Since the CV_log_loss is very small, the model is a good fit by cross validation. 
+
 
 - Evaluate the performance of your model(s). Is your model achieving similar performance
 between the majority race group “White” and the minority “Black” (or “Black” + “Other”)? If not, could you try to improve the fairness (i.e., reducing the gap of prediction performance between the majority and minority) of your model(s)?
 
 ## Survival Analysis
 
-```{r}
-km_fit = survfit(Surv(survival_months, status) ~ 1, data = survival_df)
-ggsurvplot(km_fit, conf.int = TRUE, title = "Kaplan-Meier Survival Curve")
+```{r prepare_survival}
+surv_obj = Surv(time = survival_df$survival_months, event = survival_df$status)
+```
 
-# Fit a Cox Proportional Hazards Model
-cox_model <- coxph(Surv(survival_months, status) ~ age + race + marital_status + t_stage + n_stage + x6th_stage + differentiate + grade + a_stage + tumor_size + estrogen_status + progesterone_status + regional_node_examined + reginol_node_positive, data = survival_df)
-summary(cox_model)
+### Kaplan Meier Curve
 
-# Check proportional hazards assumption
+```{r km_curve}
+km_fit = survfit(surv_obj ~ 1, data = survival_df)
+
+ggsurvfit(km_fit, type = "survival", linewidth = 1) +
+  labs(x = "Months", 
+       y = "Overall survival",
+       title = "Kaplan-Meier Survival Curve") +
+  add_confidence_interval() +
+  add_risktable() +
+  scale_ggsurvfit()
+```
+
+### Cox Regression
+
+```{r cox_model}
+cox_model = coxph(surv_obj ~ 
+                    age + race + marital_status + t_stage + n_stage + x6th_stage +
+                       differentiate + a_stage + tumor_size + estrogen_status +
+                       progesterone_status + regional_node_examined + reginol_node_positive, 
+                  data = as.data.frame(survival_df))
 cox.zph(cox_model)
-
-# Visualize adjusted survival curves
-ggsurvplot(survfit(cox_model), data = survival_df, title = "Cox Model Survival Curve")
 ```
 
 
+```{r forest_plot, fig.asp = 1.5}
+ggforest(cox_model)
+```
 
+The x-axis of this forest plot represents hazard ratios. HR = 1 means no significant difference compared to the reference, and a HR higher than 1 means it increases the hazard ratio of the event, death, and a HR lower than 1 decreases it.
 
 
 
