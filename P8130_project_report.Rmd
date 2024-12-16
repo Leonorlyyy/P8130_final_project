@@ -33,3 +33,5 @@ The data we used for this analysis originates from a breast cancer survival data
 
 ## Group members' contribution
 
+Leyang and Jinghan focused on statistical methods, building models to extract meaningful insights. Yuechu and Yifei concentrated on data description and visualization, presenting information through clear visuals. All four of us contributed to the writing of the report, integrating our individual efforts into a cohesive final report that reflects both analytical depth and visual clarity.
+
