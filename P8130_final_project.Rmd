@@ -95,6 +95,8 @@ The majority of patients in the dataset are White, accounting for approximately 
 
 The wide range of values in variables such as `tumor_size`, `regional_node_examined`, and `survival_months` indicates the need to explore relationships and their potential nonlinearities with survival, giving us a possible analytical regression model.
 
+Since the two variables `grade` and `differentiate` represent the same variable with different names, we will not consider the variable `grade` in the further analysis.
+
 
 ```{r}
 colSums(is.na(survival_df))
