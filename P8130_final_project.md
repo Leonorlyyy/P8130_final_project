@@ -909,6 +909,15 @@ AUC is 0.7422428.
   between the majority and minority) of your model(s)?
 
 ``` r
+race_combine_df = 
+  survival_df %>%
+  mutate(
+    race = fct_collapse(
+      race,
+      "Black or other" = c("Black", "Other")  
+    )
+  )
+
 eval_produce = function(model, df) {
   
   results = 
@@ -931,13 +940,7 @@ eval_produce = function(model, df) {
 }
 
 stra_cv_df = 
-  survival_df %>%
-  mutate(
-    race = fct_collapse(
-      race,
-      "Black or other" = c("Black", "Other")  
-    )
-  ) %>% 
+  race_combine_df %>% 
   vfold_cv(v = 10, strata = race) %>% 
   mutate(
     train = map(splits, training),
@@ -970,14 +973,48 @@ stra_res_df %>%
 Low log loss and high AUC indicate better test performance.
 
 To reduce the gap of prediction performance between the majority and
-minority, we can try to add an interaction term in the model.
+minority, we focused on whether there were interactions between the
+variables. We extracted each variable from the best model and examined
+how it differed in survival months of survival by race. Most variables
+did not show significant differences by race, suggesting that there may
+not be an interaction between these variables and race. However, the
+variable marital status showed a different pattern.
+
+``` r
+race_combine_df %>% 
+  ggplot(aes(x = marital_status, y = survival_months, fill = race)) +
+  geom_boxplot()  +
+  geom_smooth(method = "lm") +
+  scale_fill_brewer(palette = "RdBu") +
+  labs(
+    title = "Survival Months Distribution by Marital Status in Race Groups",
+    x = "Marital Status",
+    y = "Survival Months",
+    fill = "Race"
+  )
+```
+
+<div class="figure">
+
+<img src="P8130_final_project_files/figure-gfm/race_inter_marital}-1.png" alt="Survival Months Distribution by Marital Status in Race Groups" width="90%" />
+<p class="caption">
+Survival Months Distribution by Marital Status in Race Groups
+</p>
+
+</div>
+
+From the figure we can see that the distribution of survival months is
+different between races with different marital status. This indicates
+the potential interaction between race and marital status, and the
+interaction term can be added in the model to improve the fairness of
+the model.
 
 ``` r
 glm_inter_fit = function(data) {
   
   fit = glm(formula = status ~ age + race + marital_status + t_stage + n_stage + 
         differentiate + estrogen_status + progesterone_status + 
-        regional_node_examined + regional_node_positive + age * race + marital_status * race, 
+        regional_node_examined + regional_node_positive + marital_status * race, 
         family = binomial, data = data)
   
   return(fit)
@@ -1004,13 +1041,12 @@ inter_res_df %>%
 
 | race           | avg_log_loss | avg_AUC |
 |:---------------|-------------:|--------:|
-| Black or other |       0.4204 |  0.7220 |
-| White          |       0.3648 |  0.7501 |
+| Black or other |       0.4169 |  0.7251 |
+| White          |       0.3647 |  0.7501 |
 
-By adding interaction term `age * race` and `marital_status * race`, we
-can observe a decrease in log loss and an increase in AUC, which means
-an improve in the fairness between group “White” and the minority
-“Black” + “Other”.
+By adding interaction term `marital_status * race`, we can observe a
+decrease in log loss and an increase in AUC, which means an improve in
+the fairness between group “White” and the minority “Black” + “Other”.
 
 ## Survival Analysis
 
