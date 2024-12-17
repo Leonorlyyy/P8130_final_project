@@ -3,7 +3,7 @@ title: "P8130_final_project"
 author: "Leonor Rui"
 date: "2024-12-03"
 output:
-  github_document
+  pdf_document
 editor_options:
   chunk_output_type: console
 ---
@@ -271,7 +271,7 @@ The last one is the distribution of all tumor sizes, and most of the tumor sizes
 
 ## Survival Months by Status
 
-```{r survival_months_by_status, echo=FALSE, fig.cap="Survival_Months_by_Status"}
+```{r survival_months_by_status, echo=FALSE, fig.cap="Survival Months by Status"}
 ggplot(survival_df, aes(x = status, y = survival_months)) + 
   geom_boxplot(fill = "light blue") +
   labs(title = "Boxplot of Survival Months by Status", x = "Status", y = "Survival Months") +
@@ -283,7 +283,7 @@ The Alive group has a higher median survival time (approximately 75 months) with
 
 ## Tumor Sizes by T_stage
 
-```{r tumor_sizes_by_t_stage, echo=FALSE, fig.cap="Tumor Sizes by T_stage"}
+```{r tumor_sizes_by_t_stage, echo=FALSE, fig.cap="Tumor Sizes by T-stage"}
 ggplot(survival_df, aes(x = tumor_size, y = t_stage)) +
   geom_boxplot(fill = "light blue") +
   scale_x_continuous(breaks = seq(0, max(survival_df$tumor_size, na.rm = TRUE), by = 10)) +
@@ -301,7 +301,7 @@ In this plot, we explore the tumor size distribution at different T stages. From
 
 ## Survival Months by A_stage Based on Status
 
-```{r survival_months_by_a_stage_based_on_status, echo=FALSE, fig.cap="Survival Months by A_stage Based on Status"}
+```{r survival_months_by_a_stage_based_on_status, echo=FALSE, fig.cap="Survival Months by A-stage Based on Status"}
 ggplot(survival_df, aes(x = survival_months, y = a_stage)) +
   geom_boxplot(fill = "light blue") +
   scale_x_continuous(breaks = seq(0, max(survival_df$survival_months, na.rm = TRUE), by = 10)) +
@@ -355,7 +355,7 @@ This figure highlights the differences in tumor size distribution and trends wit
 ## Positive Regional Node vs Survival Months Across Differentiate
 
 
-```{r positive_regional_node_vs_survival_months_across_differentiate}, echo=FALSE, fig.cap="Positive Regional Node vs Survival Months Across Differentiate"}
+```{r positive regional node vs survival months across differentiate, echo=FALSE, fig.cap="Positive Regional Node vs Survival Months Across Differentiate"}
 ggplot(survival_df, aes(x = regional_node_positive, y = survival_months)) +
   geom_point(color = "light blue", size = 0.5, alpha = 0.5)  +
   facet_wrap(.~differentiate) +
@@ -447,7 +447,7 @@ forward_glm = MASS::stepAIC(full_glm, direction = "forward", trace = FALSE)
 
 forward_glm %>% 
   broom::tidy() %>% 
-  knitr::kable(digits = 4)
+  knitr::kable(digits = 4, caption = "Results of Forward Selection Model", format = "pipe")
 ```
 
 #### Backward Elimination
@@ -457,7 +457,7 @@ backward_glm = MASS::stepAIC(full_glm, direction = "backward", trace = FALSE)
 
 backward_glm %>% 
   broom::tidy() %>% 
-  knitr::kable(digits = 4)
+  knitr::kable(digits = 4, caption = "Results of Backward Elimination Model", format = "pipe")
 ```
 
 #### Stepwise Regression
@@ -467,7 +467,7 @@ stepwise_glm = MASS::stepAIC(full_glm, direction = "both", trace = FALSE)
 
 stepwise_glm %>% 
   broom::tidy() %>% 
-  knitr::kable(digits = 4)
+  knitr::kable(digits = 4, caption = "Results of Stepwise Regression Model", format = "pipe")
 ```
 
 The backward and stepwise procedure produced the same model.
@@ -487,7 +487,7 @@ model_selection =
   select(type, AIC, BIC)
 
 model_selection %>%
-  knitr::kable(digits = 4, caption = "Model Selection")
+  knitr::kable(digits = 4, caption = "Model Selection", format = "pipe")
 
 final_glm = stepwise_glm
 ```
@@ -500,7 +500,7 @@ By comparing AIC and BIC, we can see the model given by backward elimination or 
 
 ```{r}
 vif(final_glm) %>% 
-  knitr::kable(digits = 4)
+  knitr::kable(digits = 4, caption = "Examination for Multicolinearity", format = "pipe")
 ```
 
 Variance Inflation Factor is a commonly used method for detecting multicollinearity in regression models. VIF is generally calculated for the continuous variables, and Generalized Variance Inflation Factor (GVIF) is used for evaluating the multicollinearity for categorical variables.
@@ -509,13 +509,15 @@ The adjusted GVIF (i.e. GVIF^(1/(2*Df))) values are corrected for the degree of 
 
 The table shows that most variables do not show multicollinearity, with the exception of `regional_node_positive`. Since its adjusted GVIF is not much different from 2, we will keep this variable for now.
 
-```{r}
+```{r, fig.cap="Residual versus Fitted Values Plot"}
 augment(final_glm) |>
   ggplot(aes(x = .fitted, y = .std.resid)) +
   geom_point() +
   geom_smooth(se = FALSE) +
   labs(x = "Fitted value", y = "Residual")
+```
 
+```{r, fig.cap="Random Quantile Residual versus Fitted Values Plot"}
 augment_quantile(final_glm) |>
   ggplot(aes(x = .fitted, y = .quantile.resid)) +
   geom_point() +
@@ -525,7 +527,7 @@ augment_quantile(final_glm) |>
 
 By randomizing the quantile residuals, we resolve the problem that the RVF plot always shows a pattern in logistic regression because of the binary response variable. Since in the randomized quantile residual vs. fitted value plot, the residuals distribute randomly around the 0.5 horizontal line, the residual assumption is met and the model is a good fit.
 
-```{r}
+```{r, fig.cap="Residual versus Leverage Plot"}
 plot(final_glm, which = 5)
 ```
 
@@ -545,7 +547,7 @@ final_glm_df =
   rename(p_value = pr_z)
 
 final_glm_df %>% 
-  knitr::kable(digits = 4)
+  knitr::kable(digits = 4, caption = "Final Model Results with Adjusted-Odds Ratio", format = "pipe")
 ```
 
 ### Cross Validation
@@ -591,7 +593,7 @@ cv_res_df =
 
 cv_res_df %>% 
   select(log_loss, AUC) %>% 
-  knitr::kable(digits = 4)
+  knitr::kable(digits = 4, caption = "Results of 10-Fold Cross Validation", format = "pipe")
 ```
 
 
@@ -657,14 +659,14 @@ stra_res_df %>%
     avg_log_loss = mean(log_loss),
     avg_AUC = mean(AUC)
   ) %>% 
-  knitr::kable(digits = 4)
+  knitr::kable(digits = 4, caption = "Race Comparison Before Adding Interaction Terms", format = "pipe")
 ```
 
 Low log loss and high AUC indicate better test performance.
 
 To reduce the gap of prediction performance between the majority and minority, we focused on whether there were interactions between the variables. We extracted each variable from the best model and examined how it differed in survival months of survival by race. Most variables did not show significant differences by race, suggesting that there may not be an interaction between these variables and race. However, the variable marital status showed a different pattern.
 
-```{r race_inter_marital}, fig.cap="Survival Months Distribution by Marital Status in Race Groups"}
+```{r race_inter_marital, fig.cap="Survival Months Distribution by Marital Status in Race Groups"}
 race_combine_df %>% 
   ggplot(aes(x = marital_status, y = survival_months, fill = race)) +
   geom_boxplot()  +
@@ -707,7 +709,7 @@ inter_res_df %>%
     avg_log_loss = mean(log_loss),
     avg_AUC = mean(AUC)
   ) %>% 
-  knitr::kable(digits = 4)
+  knitr::kable(digits = 4, caption = "Race Comparison After Adding Interaction Terms", format = "pipe")
 ```
 
 By adding interaction term `marital_status * race`, we can observe a decrease in log loss and an increase in AUC, which means an improve in the fairness between group “White” and the minority “Black” + “Other”.
@@ -722,7 +724,7 @@ surv_obj = Surv(time = survival_df$survival_months, event = survival_df$status)
 
 The Kaplan Meier curve graphically represent the survival rate. Time is plotted on the x-axis and the survival rate is plotted on the y-axis.
 
-```{r km_curve}
+```{r km_curve, fig.cap="Kaplan-Meier Survival Curve"}
 km_fit = survfit(surv_obj ~ 1, data = survival_df)
 
 ggsurvfit(km_fit, type = "survival", linewidth = 1) +
@@ -737,7 +739,7 @@ ggsurvfit(km_fit, type = "survival", linewidth = 1) +
 
 The log rank test lets us test whether there is a difference in survival times between groups of patients. For example, we want to find out whether there is a significant difference in survival between patients whose cells have different degrees of differentiation.
 
-```{r log_rank, fig.asp = .8}
+```{r log_rank, fig.asp = .8, fig.cap="Survival Time Across Differentiated Stages"}
 log_rank_fit = survfit(surv_obj ~ differentiate, data = survival_df)
 
 
@@ -779,12 +781,12 @@ We will test this assumption based on the scaled Schoenfeld residuals. Here is a
 cox.zph(cox_model) %>%
   .$table %>%
   as.data.frame() %>% 
-  knitr::kable(digits = 4)
+  knitr::kable(digits = 4, caption = "Results of Cox Proportional Hazard Model", format = "pipe")
 ```
 
 We can see from the table that variable `a_stage`, `estrogen_status`, `progesterone_status` are not constant over time, which means it's not proper to contain these covariates in cox regression. To reduce bias of the model, we can remove these variables and take a closer look at the result.
 
-```{r forest_plot, fig.asp = 1.5, out.width="100%"}
+```{r forest_plot, fig.asp = 1.5, out.width="100%", fig.cap="Forest Plot of Hazard Ratios"}
 cox_new_model = coxph(surv_obj ~ age + race + marital_status + t_stage + n_stage + x6th_stage +
                       differentiate + tumor_size + regional_node_examined + regional_node_positive,
                     data = as.data.frame(survival_df))

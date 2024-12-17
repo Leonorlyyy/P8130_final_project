@@ -581,7 +581,7 @@ forward_glm = MASS::stepAIC(full_glm, direction = "forward", trace = FALSE)
 
 forward_glm %>% 
   broom::tidy() %>% 
-  knitr::kable(digits = 4)
+  knitr::kable(digits = 4, caption = "Results of Forward Selection Model", format = "pipe")
 ```
 
 | term                                   | estimate | std.error | statistic | p.value |
@@ -613,6 +613,8 @@ forward_glm %>%
 | regional_node_examined                 |  -0.0359 |    0.0072 |   -4.9924 |  0.0000 |
 | regional_node_positive                 |   0.0791 |    0.0154 |    5.1473 |  0.0000 |
 
+Results of Forward Selection Model
+
 #### Backward Elimination
 
 ``` r
@@ -620,7 +622,7 @@ backward_glm = MASS::stepAIC(full_glm, direction = "backward", trace = FALSE)
 
 backward_glm %>% 
   broom::tidy() %>% 
-  knitr::kable(digits = 4)
+  knitr::kable(digits = 4, caption = "Results of Backward Elimination Model", format = "pipe")
 ```
 
 | term                                   | estimate | std.error | statistic | p.value |
@@ -645,6 +647,8 @@ backward_glm %>%
 | progesterone_statusPositive            |  -0.5842 |    0.1275 |   -4.5811 |  0.0000 |
 | regional_node_examined                 |  -0.0359 |    0.0072 |   -5.0110 |  0.0000 |
 | regional_node_positive                 |   0.0797 |    0.0153 |    5.2076 |  0.0000 |
+
+Results of Backward Elimination Model
 
 #### Stepwise Regression
 
@@ -653,7 +657,7 @@ stepwise_glm = MASS::stepAIC(full_glm, direction = "both", trace = FALSE)
 
 stepwise_glm %>% 
   broom::tidy() %>% 
-  knitr::kable(digits = 4)
+  knitr::kable(digits = 4, caption = "Results of Stepwise Regression Model", format = "pipe")
 ```
 
 | term                                   | estimate | std.error | statistic | p.value |
@@ -678,6 +682,8 @@ stepwise_glm %>%
 | progesterone_statusPositive            |  -0.5842 |    0.1275 |   -4.5811 |  0.0000 |
 | regional_node_examined                 |  -0.0359 |    0.0072 |   -5.0110 |  0.0000 |
 | regional_node_positive                 |   0.0797 |    0.0153 |    5.2076 |  0.0000 |
+
+Results of Stepwise Regression Model
 
 The backward and stepwise procedure produced the same model.
 
@@ -696,7 +702,7 @@ model_selection =
   select(type, AIC, BIC)
 
 model_selection %>%
-  knitr::kable(digits = 4, caption = "Model Selection")
+  knitr::kable(digits = 4, caption = "Model Selection", format = "pipe")
 ```
 
 | type     |      AIC |      BIC |
@@ -729,7 +735,7 @@ to be our “best model”.
 
 ``` r
 vif(final_glm) %>% 
-  knitr::kable(digits = 4)
+  knitr::kable(digits = 4, caption = "Examination for Multicolinearity", format = "pipe")
 ```
 
 |                        |   GVIF |  Df | GVIF^(1/(2\*Df)) |
@@ -744,6 +750,8 @@ vif(final_glm) %>%
 | progesterone_status    | 1.4275 |   1 |           1.1948 |
 | regional_node_examined | 1.4778 |   1 |           1.2157 |
 | regional_node_positive | 4.2484 |   1 |           2.0612 |
+
+Examination for Multicolinearity
 
 Variance Inflation Factor is a commonly used method for detecting
 multicollinearity in regression models. VIF is generally calculated for
@@ -768,7 +776,14 @@ augment(final_glm) |>
   labs(x = "Fitted value", y = "Residual")
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-12-1.png" width="90%" />
+<div class="figure">
+
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-12-1.png" alt="Residual versus Fitted Values Plot" width="90%" />
+<p class="caption">
+Residual versus Fitted Values Plot
+</p>
+
+</div>
 
 ``` r
 augment_quantile(final_glm) |>
@@ -778,7 +793,14 @@ augment_quantile(final_glm) |>
   labs(x = "Fitted value", y = "Randomized quantile residual")
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-12-2.png" width="90%" />
+<div class="figure">
+
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-13-1.png" alt="Random Quantile Residual versus Fitted Values Plot" width="90%" />
+<p class="caption">
+Random Quantile Residual versus Fitted Values Plot
+</p>
+
+</div>
 
 By randomizing the quantile residuals, we resolve the problem that the
 RVF plot always shows a pattern in logistic regression because of the
@@ -791,7 +813,14 @@ fit.
 plot(final_glm, which = 5)
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-13-1.png" width="90%" />
+<div class="figure">
+
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-14-1.png" alt="Residual versus Leverage Plot" width="90%" />
+<p class="caption">
+Residual versus Leverage Plot
+</p>
+
+</div>
 
 The residual vs. leverage plot indicates that observations 3527, 1561,
 and 3074 may be potential outliers, but they are not necessarily
@@ -806,36 +835,38 @@ final_glm_df =
   as.data.frame(final_glm_summary$coefficients) |>
   janitor::clean_names() |>
   mutate(
-    odds_ratio = exp(estimate)
+    adjusted_odds_ratio = exp(estimate)
   ) |>
   rename(p_value = pr_z)
 
 final_glm_df %>% 
-  knitr::kable(digits = 4)
+  knitr::kable(digits = 4, caption = "Final Model Results with Adjusted-Odds Ratio", format = "pipe")
 ```
 
-|                                        | estimate | std_error | z_value | p_value | odds_ratio |
-|:---------------------------------------|---------:|----------:|--------:|--------:|-----------:|
-| (Intercept)                            |  -2.2838 |    0.4385 | -5.2085 |  0.0000 |     0.1019 |
-| age                                    |   0.0238 |    0.0056 |  4.2426 |  0.0000 |     1.0241 |
-| raceOther                              |  -0.9346 |    0.2485 | -3.7616 |  0.0002 |     0.3928 |
-| raceWhite                              |  -0.5148 |    0.1617 | -3.1845 |  0.0014 |     0.5976 |
-| marital_statusMarried                  |  -0.2110 |    0.1416 | -1.4900 |  0.1362 |     0.8097 |
-| marital_statusSeparated                |   0.6691 |    0.3881 |  1.7240 |  0.0847 |     1.9526 |
-| marital_statusSingle                   |  -0.0646 |    0.1748 | -0.3696 |  0.7117 |     0.9374 |
-| marital_statusWidowed                  |   0.0175 |    0.2211 |  0.0791 |  0.9369 |     1.0176 |
-| t_stageT2                              |   0.4111 |    0.1130 |  3.6372 |  0.0003 |     1.5085 |
-| t_stageT3                              |   0.5516 |    0.1488 |  3.7077 |  0.0002 |     1.7360 |
-| t_stageT4                              |   1.0988 |    0.2445 |  4.4934 |  0.0000 |     3.0005 |
-| n_stageN2                              |   0.4363 |    0.1284 |  3.3987 |  0.0007 |     1.5470 |
-| n_stageN3                              |   0.5872 |    0.2345 |  2.5034 |  0.0123 |     1.7989 |
-| differentiateModerately differentiated |   0.5328 |    0.1838 |  2.8990 |  0.0037 |     1.7036 |
-| differentiatePoorly differentiated     |   0.9190 |    0.1924 |  4.7772 |  0.0000 |     2.5069 |
-| differentiateUndifferentiated          |   1.8649 |    0.5538 |  3.3672 |  0.0008 |     6.4551 |
-| estrogen_statusPositive                |  -0.7480 |    0.1775 | -4.2140 |  0.0000 |     0.4733 |
-| progesterone_statusPositive            |  -0.5842 |    0.1275 | -4.5811 |  0.0000 |     0.5576 |
-| regional_node_examined                 |  -0.0359 |    0.0072 | -5.0110 |  0.0000 |     0.9647 |
-| regional_node_positive                 |   0.0797 |    0.0153 |  5.2076 |  0.0000 |     1.0829 |
+|  | estimate | std_error | z_value | p_value | adjusted_odds_ratio |
+|:---|---:|---:|---:|---:|---:|
+| (Intercept) | -2.2838 | 0.4385 | -5.2085 | 0.0000 | 0.1019 |
+| age | 0.0238 | 0.0056 | 4.2426 | 0.0000 | 1.0241 |
+| raceOther | -0.9346 | 0.2485 | -3.7616 | 0.0002 | 0.3928 |
+| raceWhite | -0.5148 | 0.1617 | -3.1845 | 0.0014 | 0.5976 |
+| marital_statusMarried | -0.2110 | 0.1416 | -1.4900 | 0.1362 | 0.8097 |
+| marital_statusSeparated | 0.6691 | 0.3881 | 1.7240 | 0.0847 | 1.9526 |
+| marital_statusSingle | -0.0646 | 0.1748 | -0.3696 | 0.7117 | 0.9374 |
+| marital_statusWidowed | 0.0175 | 0.2211 | 0.0791 | 0.9369 | 1.0176 |
+| t_stageT2 | 0.4111 | 0.1130 | 3.6372 | 0.0003 | 1.5085 |
+| t_stageT3 | 0.5516 | 0.1488 | 3.7077 | 0.0002 | 1.7360 |
+| t_stageT4 | 1.0988 | 0.2445 | 4.4934 | 0.0000 | 3.0005 |
+| n_stageN2 | 0.4363 | 0.1284 | 3.3987 | 0.0007 | 1.5470 |
+| n_stageN3 | 0.5872 | 0.2345 | 2.5034 | 0.0123 | 1.7989 |
+| differentiateModerately differentiated | 0.5328 | 0.1838 | 2.8990 | 0.0037 | 1.7036 |
+| differentiatePoorly differentiated | 0.9190 | 0.1924 | 4.7772 | 0.0000 | 2.5069 |
+| differentiateUndifferentiated | 1.8649 | 0.5538 | 3.3672 | 0.0008 | 6.4551 |
+| estrogen_statusPositive | -0.7480 | 0.1775 | -4.2140 | 0.0000 | 0.4733 |
+| progesterone_statusPositive | -0.5842 | 0.1275 | -4.5811 | 0.0000 | 0.5576 |
+| regional_node_examined | -0.0359 | 0.0072 | -5.0110 | 0.0000 | 0.9647 |
+| regional_node_positive | 0.0797 | 0.0153 | 5.2076 | 0.0000 | 1.0829 |
+
+Final Model Results with Adjusted-Odds Ratio
 
 ### Cross Validation
 
@@ -880,7 +911,7 @@ cv_res_df =
 
 cv_res_df %>% 
   select(log_loss, AUC) %>% 
-  knitr::kable(digits = 4)
+  knitr::kable(digits = 4, caption = "Results of 10-Fold Cross Validation", format = "pipe")
 ```
 
 | log_loss |    AUC |
@@ -895,6 +926,8 @@ cv_res_df %>%
 |   0.3636 | 0.7951 |
 |   0.3681 | 0.7644 |
 |   0.3718 | 0.7405 |
+
+Results of 10-Fold Cross Validation
 
 After applying 10-fold cross-validation, we evaluate the goodness of fit
 by log loss and AUC. The mean of log loss is 0.3723182, and the mean of
@@ -962,13 +995,15 @@ stra_res_df %>%
     avg_log_loss = mean(log_loss),
     avg_AUC = mean(AUC)
   ) %>% 
-  knitr::kable(digits = 4)
+  knitr::kable(digits = 4, caption = "Race Comparison Before Adding Interaction Terms", format = "pipe")
 ```
 
 | race           | avg_log_loss | avg_AUC |
 |:---------------|-------------:|--------:|
 | Black or other |       0.4231 |  0.6997 |
 | White          |       0.3651 |  0.7502 |
+
+Race Comparison Before Adding Interaction Terms
 
 Low log loss and high AUC indicate better test performance.
 
@@ -1036,13 +1071,15 @@ inter_res_df %>%
     avg_log_loss = mean(log_loss),
     avg_AUC = mean(AUC)
   ) %>% 
-  knitr::kable(digits = 4)
+  knitr::kable(digits = 4, caption = "Race Comparison After Adding Interaction Terms", format = "pipe")
 ```
 
 | race           | avg_log_loss | avg_AUC |
 |:---------------|-------------:|--------:|
 | Black or other |       0.4169 |  0.7251 |
 | White          |       0.3647 |  0.7501 |
+
+Race Comparison After Adding Interaction Terms
 
 By adding interaction term `marital_status * race`, we can observe a
 decrease in log loss and an increase in AUC, which means an improve in
@@ -1070,7 +1107,14 @@ ggsurvfit(km_fit, type = "survival", linewidth = 1) +
   scale_ggsurvfit()
 ```
 
-<img src="P8130_final_project_files/figure-gfm/km_curve-1.png" width="90%" />
+<div class="figure">
+
+<img src="P8130_final_project_files/figure-gfm/km_curve-1.png" alt="Kaplan-Meier Survival Curve" width="90%" />
+<p class="caption">
+Kaplan-Meier Survival Curve
+</p>
+
+</div>
 
 ### Log Rank Test
 
@@ -1099,7 +1143,14 @@ log_rank_plot$plot +
   guides(color = guide_legend(nrow = 2))
 ```
 
-<img src="P8130_final_project_files/figure-gfm/log_rank-1.png" width="90%" />
+<div class="figure">
+
+<img src="P8130_final_project_files/figure-gfm/log_rank-1.png" alt="Survival Time Across Differentiated Stages" width="90%" />
+<p class="caption">
+Survival Time Across Differentiated Stages
+</p>
+
+</div>
 
 ### Cox Model
 
@@ -1134,7 +1185,7 @@ value, the greater the violation of the assumption.
 cox.zph(cox_model) %>%
   .$table %>%
   as.data.frame() %>% 
-  knitr::kable(digits = 4)
+  knitr::kable(digits = 4, caption = "Results of Cox Proportional Hazard Model", format = "pipe")
 ```
 
 |                        |   chisq |  df |      p |
@@ -1154,6 +1205,8 @@ cox.zph(cox_model) %>%
 | regional_node_positive |  0.0324 |   1 | 0.8571 |
 | GLOBAL                 | 57.2155 |  24 | 0.0002 |
 
+Results of Cox Proportional Hazard Model
+
 We can see from the table that variable `a_stage`, `estrogen_status`,
 `progesterone_status` are not constant over time, which means it’s not
 proper to contain these covariates in cox regression. To reduce bias of
@@ -1169,7 +1222,14 @@ ggforest(cox_new_model,
          fontsize = 0.6)
 ```
 
-<img src="P8130_final_project_files/figure-gfm/forest_plot-1.png" width="100%" />
+<div class="figure">
+
+<img src="P8130_final_project_files/figure-gfm/forest_plot-1.png" alt="Forest Plot of Hazard Ratios" width="100%" />
+<p class="caption">
+Forest Plot of Hazard Ratios
+</p>
+
+</div>
 
 The hazard ratio is similar to relative risk, but differs in that the HR
 is the instantaneous risk rather than the cumulative risk over the
