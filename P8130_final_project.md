@@ -128,61 +128,6 @@ summary(survival_df)
 ## Descriptive table for numerical variables
 
 ``` r
-summary_table = survival_df |> 
-  summarise(
-    age_Mean = mean(age, na.rm = TRUE),
-    age_SD = sd(age, na.rm = TRUE),
-    age_Median = median(age, na.rm = TRUE),
-    age_IQR = IQR(age, na.rm = TRUE),
-    
-    tumor_size_Mean = mean(tumor_size, na.rm = TRUE),
-    tumor_size_SD = sd(tumor_size, na.rm = TRUE),
-    tumor_size_Median = median(tumor_size, na.rm = TRUE),
-    tumor_size_IQR = IQR(tumor_size, na.rm = TRUE),
-    
-    regional_node_examined_Mean = mean(regional_node_examined, na.rm = TRUE),
-    regional_node_examined_SD = sd(regional_node_examined, na.rm = TRUE),
-    regional_node_examined_Median = median(regional_node_examined, na.rm = TRUE),
-    regional_node_examined_IQR = IQR(regional_node_examined, na.rm = TRUE),
-    
-    reginol_node_positive_Mean = mean(reginol_node_positive, na.rm = TRUE),
-    reginol_node_positive_SD = sd(reginol_node_positive, na.rm = TRUE),
-    reginol_node_positive_Median = median(reginol_node_positive, na.rm = TRUE),
-    reginol_node_positive_IQR = IQR(reginol_node_positive, na.rm = TRUE),
-    
-    survival_months_Mean = mean(survival_months, na.rm = TRUE),
-    survival_months_SD = sd(survival_months, na.rm = TRUE),
-    survival_months_Median = median(survival_months, na.rm = TRUE),
-    survival_months_IQR = IQR(survival_months, na.rm = TRUE)
-  )
-
-final_table = data.frame(
-  Variable = c("Age", "Tumor Size", "Regional Nodes Examined", "Regional Nodes Positive", "Survival Months"),
-  Mean = c(summary_table$age_Mean, summary_table$tumor_size_Mean, 
-           summary_table$regional_node_examined_Mean, summary_table$reginol_node_positive_Mean, 
-           summary_table$survival_months_Mean),
-  SD = c(summary_table$age_SD, summary_table$tumor_size_SD, 
-         summary_table$regional_node_examined_SD, summary_table$reginol_node_positive_SD, 
-         summary_table$survival_months_SD),
-  Median = c(summary_table$age_Median, summary_table$tumor_size_Median, 
-             summary_table$regional_node_examined_Median, summary_table$reginol_node_positive_Median, 
-             summary_table$survival_months_Median),
-  IQR = c(summary_table$age_IQR, summary_table$tumor_size_IQR, 
-          summary_table$regional_node_examined_IQR, summary_table$reginol_node_positive_IQR, 
-          summary_table$survival_months_IQR)
-)
-
-print(final_table)
-```
-
-    ##                  Variable      Mean        SD Median IQR
-    ## 1                     Age 53.972167  8.963134     54  14
-    ## 2              Tumor Size 30.473658 21.119696     25  22
-    ## 3 Regional Nodes Examined 14.357107  8.099675     14  10
-    ## 4 Regional Nodes Positive  4.158052  5.109331      2   4
-    ## 5         Survival Months 71.297962 22.921430     73  34
-
-``` r
 numeric_summary = survival_df |> 
   summarize(
     age_Mean = mean(age, na.rm = TRUE),
@@ -254,46 +199,15 @@ categorical_long = data.frame(
   ), 4)
 )
 
+categorical_long = categorical_long |> 
+  separate(Variable, into = c("Variable Name", "Level"), sep = " (?=Positive|Negative|Alive|Dead)")
+
 final_table = list(
   Numeric_Summary = numeric_table,
   Categorical_Summary = categorical_long
 )
 
-print("Numeric Variables Summary")
-```
 
-    ## [1] "Numeric Variables Summary"
-
-``` r
-print(numeric_table)
-```
-
-    ##                  Variable      Mean        SD Median IQR
-    ## 1                     Age 53.972167  8.963134     54  14
-    ## 2              Tumor Size 30.473658 21.119696     25  22
-    ## 3 Regional Nodes Examined 14.357107  8.099675     14  10
-    ## 4 Regional Nodes Positive  4.158052  5.109331      2   4
-    ## 5         Survival Months 71.297962 22.921430     73  34
-
-``` r
-print("Categorical Variables Summary")
-```
-
-    ## [1] "Categorical Variables Summary"
-
-``` r
-print(categorical_long)
-```
-
-    ##                       Variable Count Proportion
-    ## 1     Estrogen Status Positive  3755     0.9332
-    ## 2     Estrogen Status Negative   269     0.0668
-    ## 3 Progesterone Status Positive  3326     0.8265
-    ## 4 Progesterone Status Negative   698     0.1735
-    ## 5                 Status Alive  3408     0.8469
-    ## 6                  Status Dead   616     0.1531
-
-``` r
 cat("### Numeric Variables Summary\n")
 ```
 
@@ -301,7 +215,7 @@ cat("### Numeric Variables Summary\n")
 
 ``` r
 knitr::kable(numeric_table, col.names = c("Variable Name", "Mean", "SD", "Median", "IQR"), 
-      caption = "Summary Statistics for Numeric Variables", format = "pipe")
+             caption = "Summary Statistics for Numeric Variables", format = "pipe")
 ```
 
 | Variable Name           |      Mean |        SD | Median | IQR |
@@ -315,7 +229,6 @@ knitr::kable(numeric_table, col.names = c("Variable Name", "Mean", "SD", "Median
 Summary Statistics for Numeric Variables
 
 ``` r
-# Print Categorical Variables Table
 cat("\n### Categorical Variables Summary\n")
 ```
 
@@ -323,18 +236,18 @@ cat("\n### Categorical Variables Summary\n")
     ## ### Categorical Variables Summary
 
 ``` r
-knitr::kable(categorical_long, col.names = c("Variable Name", "Count", "Proportion"), 
-      caption = "Summary Statistics for Categorical Variables", format = "pipe")
+knitr::kable(categorical_long, col.names = c("Variable Name", "Level", "Count", "Proportion"), 
+             caption = "Summary Statistics for Categorical Variables", format = "pipe")
 ```
 
-| Variable Name                | Count | Proportion |
-|:-----------------------------|------:|-----------:|
-| Estrogen Status Positive     |  3755 |     0.9332 |
-| Estrogen Status Negative     |   269 |     0.0668 |
-| Progesterone Status Positive |  3326 |     0.8265 |
-| Progesterone Status Negative |   698 |     0.1735 |
-| Status Alive                 |  3408 |     0.8469 |
-| Status Dead                  |   616 |     0.1531 |
+| Variable Name       | Level    | Count | Proportion |
+|:--------------------|:---------|------:|-----------:|
+| Estrogen Status     | Positive |  3755 |     0.9332 |
+| Estrogen Status     | Negative |   269 |     0.0668 |
+| Progesterone Status | Positive |  3326 |     0.8265 |
+| Progesterone Status | Negative |   698 |     0.1735 |
+| Status              | Alive    |  3408 |     0.8469 |
+| Status              | Dead     |   616 |     0.1531 |
 
 Summary Statistics for Categorical Variables
 
@@ -590,7 +503,7 @@ survival_df |>
   facet_wrap(variable ~ .,  scales = "free")
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-11-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-10-1.png" width="90%" />
 
 # Model Building
 
@@ -854,7 +767,7 @@ augment(final_glm) |>
   labs(x = "Fitted value", y = "Residual")
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-13-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-12-1.png" width="90%" />
 
 ``` r
 augment_quantile(final_glm) |>
@@ -864,7 +777,7 @@ augment_quantile(final_glm) |>
   labs(x = "Fitted value", y = "Randomized quantile residual")
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-13-2.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-12-2.png" width="90%" />
 
 By randomizing the quantile residuals, we resolve the problem that the
 RVF plot always shows a pattern in logistic regression because of the
@@ -877,7 +790,7 @@ fit.
 plot(final_glm, which = 5)
 ```
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-14-1.png" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-13-1.png" width="90%" />
 
 The residual vs. leverage plot indicates that observations 3527, 1561,
 and 3074 may be potential outliers, but they are not necessarily
@@ -900,28 +813,28 @@ final_glm_df %>%
   knitr::kable(digits = 4)
 ```
 
-|                                        | estimate | std_error | z_value | p_value | odds_ratio |
-|:---------------------------------------|---------:|----------:|--------:|--------:|-----------:|
-| (Intercept)                            |  -2.2838 |    0.4385 | -5.2085 |  0.0000 |     0.1019 |
-| age                                    |   0.0238 |    0.0056 |  4.2426 |  0.0000 |     1.0241 |
-| raceOther                              |  -0.9346 |    0.2485 | -3.7616 |  0.0002 |     0.3928 |
-| raceWhite                              |  -0.5148 |    0.1617 | -3.1845 |  0.0014 |     0.5976 |
-| marital_statusMarried                  |  -0.2110 |    0.1416 | -1.4900 |  0.1362 |     0.8097 |
-| marital_statusSeparated                |   0.6691 |    0.3881 |  1.7240 |  0.0847 |     1.9526 |
-| marital_statusSingle                   |  -0.0646 |    0.1748 | -0.3696 |  0.7117 |     0.9374 |
-| marital_statusWidowed                  |   0.0175 |    0.2211 |  0.0791 |  0.9369 |     1.0176 |
-| t_stageT2                              |   0.4111 |    0.1130 |  3.6372 |  0.0003 |     1.5085 |
-| t_stageT3                              |   0.5516 |    0.1488 |  3.7077 |  0.0002 |     1.7360 |
-| t_stageT4                              |   1.0988 |    0.2445 |  4.4934 |  0.0000 |     3.0005 |
-| n_stageN2                              |   0.4363 |    0.1284 |  3.3987 |  0.0007 |     1.5470 |
-| n_stageN3                              |   0.5872 |    0.2345 |  2.5034 |  0.0123 |     1.7989 |
-| differentiateModerately differentiated |   0.5328 |    0.1838 |  2.8990 |  0.0037 |     1.7036 |
-| differentiatePoorly differentiated     |   0.9190 |    0.1924 |  4.7772 |  0.0000 |     2.5069 |
-| differentiateUndifferentiated          |   1.8649 |    0.5538 |  3.3672 |  0.0008 |     6.4551 |
-| estrogen_statusPositive                |  -0.7480 |    0.1775 | -4.2140 |  0.0000 |     0.4733 |
-| progesterone_statusPositive            |  -0.5842 |    0.1275 | -4.5811 |  0.0000 |     0.5576 |
-| regional_node_examined                 |  -0.0359 |    0.0072 | -5.0110 |  0.0000 |     0.9647 |
-| reginol_node_positive                  |   0.0797 |    0.0153 |  5.2076 |  0.0000 |     1.0829 |
+|  | estimate | std_error | z_value | p_value | odds_ratio |
+|:---|---:|---:|---:|---:|---:|
+| (Intercept) | -2.2838 | 0.4385 | -5.2085 | 0.0000 | 0.1019 |
+| age | 0.0238 | 0.0056 | 4.2426 | 0.0000 | 1.0241 |
+| raceOther | -0.9346 | 0.2485 | -3.7616 | 0.0002 | 0.3928 |
+| raceWhite | -0.5148 | 0.1617 | -3.1845 | 0.0014 | 0.5976 |
+| marital_statusMarried | -0.2110 | 0.1416 | -1.4900 | 0.1362 | 0.8097 |
+| marital_statusSeparated | 0.6691 | 0.3881 | 1.7240 | 0.0847 | 1.9526 |
+| marital_statusSingle | -0.0646 | 0.1748 | -0.3696 | 0.7117 | 0.9374 |
+| marital_statusWidowed | 0.0175 | 0.2211 | 0.0791 | 0.9369 | 1.0176 |
+| t_stageT2 | 0.4111 | 0.1130 | 3.6372 | 0.0003 | 1.5085 |
+| t_stageT3 | 0.5516 | 0.1488 | 3.7077 | 0.0002 | 1.7360 |
+| t_stageT4 | 1.0988 | 0.2445 | 4.4934 | 0.0000 | 3.0005 |
+| n_stageN2 | 0.4363 | 0.1284 | 3.3987 | 0.0007 | 1.5470 |
+| n_stageN3 | 0.5872 | 0.2345 | 2.5034 | 0.0123 | 1.7989 |
+| differentiateModerately differentiated | 0.5328 | 0.1838 | 2.8990 | 0.0037 | 1.7036 |
+| differentiatePoorly differentiated | 0.9190 | 0.1924 | 4.7772 | 0.0000 | 2.5069 |
+| differentiateUndifferentiated | 1.8649 | 0.5538 | 3.3672 | 0.0008 | 6.4551 |
+| estrogen_statusPositive | -0.7480 | 0.1775 | -4.2140 | 0.0000 | 0.4733 |
+| progesterone_statusPositive | -0.5842 | 0.1275 | -4.5811 | 0.0000 | 0.5576 |
+| regional_node_examined | -0.0359 | 0.0072 | -5.0110 | 0.0000 | 0.9647 |
+| reginol_node_positive | 0.0797 | 0.0153 | 5.2076 | 0.0000 | 1.0829 |
 
 ### Cross Validation
 
