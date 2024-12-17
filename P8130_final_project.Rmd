@@ -540,7 +540,7 @@ final_glm_df =
   as.data.frame(final_glm_summary$coefficients) |>
   janitor::clean_names() |>
   mutate(
-    odds_ratio = exp(estimate)
+    adjusted_odds_ratio = exp(estimate)
   ) |>
   rename(p_value = pr_z)
 
