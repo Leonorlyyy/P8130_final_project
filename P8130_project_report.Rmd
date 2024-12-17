@@ -1,15 +1,18 @@
 ---
 title: "P8130_final_project"
-author: "Yifei Yu"
+author: "Yuechu Hu, Leyang Rui, Yifei Yu, Jinghan Zhao"
 date: "2024-12-03"
-output:pdf_document
-editor_options: 
+output: 
+  pdf_document:
+    keep_tex: true
+editor_options:
   chunk_output_type: console
   fontsize: 12pt
 header-includes:
   - \usepackage{setspace}
   - \doublespacing
 ---
+
 
 ```{r setup, include=FALSE}
 library(tidyverse)
@@ -27,7 +30,6 @@ library(dplyr)
 library(tidyr)
 library(ggsurvfit)
 library(survminer)
-library(bookdown)
 set.seed(11)
 
 knitr::opts_chunk$set(
@@ -116,5 +118,95 @@ Leyang and Jinghan focused on statistical methods, building models to extract me
 
 ## Appendix
 
+```{r, echo=FALSE}
+numeric_summary = survival_df |> 
+  summarize(
+    age_Mean = mean(age, na.rm = TRUE),
+    age_SD = sd(age, na.rm = TRUE),
+    age_Median = median(age, na.rm = TRUE),
+    age_IQR = IQR(age, na.rm = TRUE),
+    
+    tumor_size_Mean = mean(tumor_size, na.rm = TRUE),
+    tumor_size_SD = sd(tumor_size, na.rm = TRUE),
+    tumor_size_Median = median(tumor_size, na.rm = TRUE),
+    tumor_size_IQR = IQR(tumor_size, na.rm = TRUE),
+    
+    regional_node_examined_Mean = mean(regional_node_examined, na.rm = TRUE),
+    regional_node_examined_SD = sd(regional_node_examined, na.rm = TRUE),
+    regional_node_examined_Median = median(regional_node_examined, na.rm = TRUE),
+    regional_node_examined_IQR = IQR(regional_node_examined, na.rm = TRUE),
+    
+    reginol_node_positive_Mean = mean(reginol_node_positive, na.rm = TRUE),
+    reginol_node_positive_SD = sd(reginol_node_positive, na.rm = TRUE),
+    reginol_node_positive_Median = median(reginol_node_positive, na.rm = TRUE),
+    reginol_node_positive_IQR = IQR(reginol_node_positive, na.rm = TRUE),
+    
+    survival_months_Mean = mean(survival_months, na.rm = TRUE),
+    survival_months_SD = sd(survival_months, na.rm = TRUE),
+    survival_months_Median = median(survival_months, na.rm = TRUE),
+    survival_months_IQR = IQR(survival_months, na.rm = TRUE)
+  )
 
+numeric_table = data.frame(
+  Variable = c("Age", "Tumor Size", "Regional Nodes Examined", "Regional Nodes Positive", "Survival Months"),
+  Mean = c(numeric_summary$age_Mean, numeric_summary$tumor_size_Mean, 
+           numeric_summary$regional_node_examined_Mean, numeric_summary$reginol_node_positive_Mean, 
+           numeric_summary$survival_months_Mean),
+  SD = c(numeric_summary$age_SD, numeric_summary$tumor_size_SD, 
+         numeric_summary$regional_node_examined_SD, numeric_summary$reginol_node_positive_SD, 
+         numeric_summary$survival_months_SD),
+  Median = c(numeric_summary$age_Median, numeric_summary$tumor_size_Median, 
+             numeric_summary$regional_node_examined_Median, numeric_summary$reginol_node_positive_Median, 
+             numeric_summary$survival_months_Median),
+  IQR = c(numeric_summary$age_IQR, numeric_summary$tumor_size_IQR, 
+          numeric_summary$regional_node_examined_IQR, numeric_summary$reginol_node_positive_IQR, 
+          numeric_summary$survival_months_IQR)
+)
+
+categorical_table = survival_df |> 
+  summarize(
+    estrogen_status_Positive = sum(estrogen_status == "Positive", na.rm = TRUE),
+    estrogen_status_Negative = sum(estrogen_status == "Negative", na.rm = TRUE),
+    progesterone_status_Positive = sum(progesterone_status == "Positive", na.rm = TRUE),
+    progesterone_status_Negative = sum(progesterone_status == "Negative", na.rm = TRUE),
+    status_Alive = sum(status == "Alive", na.rm = TRUE),
+    status_Dead = sum(status == "Dead", na.rm = TRUE)
+  )
+
+categorical_long = data.frame(
+  Variable = c("Estrogen Status Positive", "Estrogen Status Negative",
+               "Progesterone Status Positive", "Progesterone Status Negative",
+               "Status Alive", "Status Dead"),
+  Count = c(categorical_table$estrogen_status_Positive, categorical_table$estrogen_status_Negative,
+            categorical_table$progesterone_status_Positive, categorical_table$progesterone_status_Negative,
+            categorical_table$status_Alive, categorical_table$status_Dead),
+  Proportion = round(c(
+    categorical_table$estrogen_status_Positive / nrow(survival_df),
+    categorical_table$estrogen_status_Negative / nrow(survival_df),
+    categorical_table$progesterone_status_Positive / nrow(survival_df),
+    categorical_table$progesterone_status_Negative / nrow(survival_df),
+    categorical_table$status_Alive / nrow(survival_df),
+    categorical_table$status_Dead / nrow(survival_df)
+  ), 4)
+)
+
+categorical_long = categorical_long |> 
+  separate(Variable, into = c("Variable Name", "Level"), sep = " (?=Positive|Negative|Alive|Dead)")
+
+final_table = list(
+  Numeric_Summary = numeric_table,
+  Categorical_Summary = categorical_long
+)
+```
+
+
+```{r, echo=FALSE}
+knitr::kable(numeric_table, col.names = c("Variable Name", "Mean", "SD", "Median", "IQR"), 
+             caption = "Summary Statistics for Numeric Variables", format = "pipe")
+```
+
+```{r, echo=FALSE}
+knitr::kable(categorical_long, col.names = c("Variable Name", "Level", "Count", "Proportion"), 
+             caption = "Summary Statistics for Categorical Variables", format = "pipe")
+```
 
