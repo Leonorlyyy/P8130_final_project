@@ -44,6 +44,7 @@ theme_set(theme_minimal() + theme(legend.position = "bottom"))
 
 survival_df = read_csv("data/Project_2_data.csv") |>
   janitor::clean_names() |>
+  rename(regional_node_positive = reginol_node_positive) |>
   mutate(
     race = factor(race),
     marital_status = factor(marital_status),
@@ -76,7 +77,7 @@ The data we used for this analysis originates from a breast cancer survival data
 ## Methods
 
 
-This report was conducted using `survival_data`, which contains information about breast cancer patients from a prospective study. The dimension of this dataset is `r nrow(survival_df)` rows and `r ncol(survival_df)` columns. It contains five numeric variables, which are `age`, `tumor_size`, `regional_node_examined`, `reginol_node_positive`, and `survival_months`, and eleven categorical variables, which are `race`, `marital_status`, `t_stage`, `n_stage`, `x6th_stage`, `differentiate`, `grade`, `a_stage`, `estrogen_status`, `progesterone_status`, and `status`. Key variables in the dataset include:
+This report was conducted using `survival_data`, which contains information about breast cancer patients from a prospective study. The dimension of this dataset is `r nrow(survival_df)` rows and `r ncol(survival_df)` columns. It contains five numeric variables, which are `age`, `tumor_size`, `regional_node_examined`, `regional_node_positive`, and `survival_months`, and eleven categorical variables, which are `race`, `marital_status`, `t_stage`, `n_stage`, `x6th_stage`, `differentiate`, `grade`, `a_stage`, `estrogen_status`, `progesterone_status`, and `status`. Key variables in the dataset include:
 
 **age**: The age of the patient (in years).
 
@@ -89,7 +90,7 @@ parts of the body remote from).
 
 **regional_node_examined**: The number of examined regional nodes.
 
-**regional_node_positive**: The number of positive reginol nodes.
+**regional_node_positive**: The number of positive regional nodes.
 
 **survival_month**: The time of a patient with breast cancer is expected to live after their diagnosis (in months).
 
@@ -101,9 +102,9 @@ The dataset comprises a total of `r count(survival_df)` observations, with no mi
 
 ## Results
 
-As shown in figure 1, we can find out that most patients are between 40 and 70 years old, and most of the survival time are larger than 45 months. The number of examined regional nodes for most subjects are smaller than 30, and the subjects with nearly 12 examined regional nodes are the most. It is worth noting that the distributions of both variables `reginol_node_positive` and `tumor_size` are significantly skewed to the right. Over 2500 subjects only have 1 or 2 positive reginol nodes, which is the most frequent number of positive reginol nodes. Most of the tumor sizes are smaller than 50 mm, and we can find that the most frequent size is around 19 mm, followed by around 14 mm.
+As shown in figure 1, we can find out that most patients are between 40 and 70 years old, and most of the survival time are larger than 45 months. The number of examined regional nodes for most subjects are smaller than 30, and the subjects with nearly 12 examined regional nodes are the most. It is worth noting that the distributions of both variables `regional_node_positive` and `tumor_size` are significantly skewed to the right. Over 2500 subjects only have 1 or 2 positive regional nodes, which is the most frequent number of positive regional nodes. Most of the tumor sizes are smaller than 50 mm, and we can find that the most frequent size is around 19 mm, followed by around 14 mm.
 
-The figure 2 distributed the survival time by the status, showing that survival months are significantly higher for the Alive group compared to the Dead group. According the figure 3, from T1 to T3, as the stage changes, both the mean tumor sizes and IQR become larger. At T4 stage, the IQR of tumor sizes is much larger than others, and the mean size is smaller than the mean size at T3 stage. We notice that there are some potential outliers both ar T1 stage and T3 stage. The survival time is longer in the Regional stage, and the Alive group shows higher survival times across both stages by looking at the figure 4. In the figure 5, the Undifferentiated group has larger tumor sizes compared to the other categories, while the Well, Moderately, and Poorly differentiated groups show similar distributions with many smaller tumors and numerous high-value outliers. The figure 6 highlights the differences in tumor size distribution and trends with age between individuals who are alive and those who are deceased. While the "Alive" group shows no significant relationship between age and tumor size, the "Dead" group exhibits a pattern where larger tumors are associated with younger ages. According the figure 7, as it changes from undifferentiated to well differentiated, the negative correlation between the number of positive reginol nodes and the survival months becomes weaker.
+The figure 2 distributed the survival time by the status, showing that survival months are significantly higher for the Alive group compared to the Dead group. According the figure 3, from T1 to T3, as the stage changes, both the mean tumor sizes and IQR become larger. At T4 stage, the IQR of tumor sizes is much larger than others, and the mean size is smaller than the mean size at T3 stage. We notice that there are some potential outliers both ar T1 stage and T3 stage. The survival time is longer in the Regional stage, and the Alive group shows higher survival times across both stages by looking at the figure 4. In the figure 5, the Undifferentiated group has larger tumor sizes compared to the other categories, while the Well, Moderately, and Poorly differentiated groups show similar distributions with many smaller tumors and numerous high-value outliers. The figure 6 highlights the differences in tumor size distribution and trends with age between individuals who are alive and those who are deceased. While the "Alive" group shows no significant relationship between age and tumor size, the "Dead" group exhibits a pattern where larger tumors are associated with younger ages. According the figure 7, as it changes from undifferentiated to well differentiated, the negative correlation between the number of positive regional nodes and the survival months becomes weaker.
 
 
 ## Conclusion/Discussion
@@ -136,10 +137,10 @@ numeric_summary = survival_df |>
     regional_node_examined_Median = median(regional_node_examined, na.rm = TRUE),
     regional_node_examined_IQR = IQR(regional_node_examined, na.rm = TRUE),
     
-    reginol_node_positive_Mean = mean(reginol_node_positive, na.rm = TRUE),
-    reginol_node_positive_SD = sd(reginol_node_positive, na.rm = TRUE),
-    reginol_node_positive_Median = median(reginol_node_positive, na.rm = TRUE),
-    reginol_node_positive_IQR = IQR(reginol_node_positive, na.rm = TRUE),
+    regional_node_positive_Mean = mean(regional_node_positive, na.rm = TRUE),
+    regional_node_positive_SD = sd(regional_node_positive, na.rm = TRUE),
+    regional_node_positive_Median = median(regional_node_positive, na.rm = TRUE),
+    regional_node_positive_IQR = IQR(regional_node_positive, na.rm = TRUE),
     
     survival_months_Mean = mean(survival_months, na.rm = TRUE),
     survival_months_SD = sd(survival_months, na.rm = TRUE),
@@ -150,16 +151,16 @@ numeric_summary = survival_df |>
 numeric_table = data.frame(
   Variable = c("Age", "Tumor Size", "Regional Nodes Examined", "Regional Nodes Positive", "Survival Months"),
   Mean = c(numeric_summary$age_Mean, numeric_summary$tumor_size_Mean, 
-           numeric_summary$regional_node_examined_Mean, numeric_summary$reginol_node_positive_Mean, 
+           numeric_summary$regional_node_examined_Mean, numeric_summary$regional_node_positive_Mean, 
            numeric_summary$survival_months_Mean),
   SD = c(numeric_summary$age_SD, numeric_summary$tumor_size_SD, 
-         numeric_summary$regional_node_examined_SD, numeric_summary$reginol_node_positive_SD, 
+         numeric_summary$regional_node_examined_SD, numeric_summary$regional_node_positive_SD, 
          numeric_summary$survival_months_SD),
   Median = c(numeric_summary$age_Median, numeric_summary$tumor_size_Median, 
-             numeric_summary$regional_node_examined_Median, numeric_summary$reginol_node_positive_Median, 
+             numeric_summary$regional_node_examined_Median, numeric_summary$regional_node_positive_Median, 
              numeric_summary$survival_months_Median),
   IQR = c(numeric_summary$age_IQR, numeric_summary$tumor_size_IQR, 
-          numeric_summary$regional_node_examined_IQR, numeric_summary$reginol_node_positive_IQR, 
+          numeric_summary$regional_node_examined_IQR, numeric_summary$regional_node_positive_IQR, 
           numeric_summary$survival_months_IQR)
 )
 
@@ -215,7 +216,7 @@ knitr::kable(categorical_long, col.names = c("Variable Name", "Level", "Count", 
 ```{r distribution_of_the_continuous_variables, echo=FALSE, fig.cap="Distribution of the Continuous Variables"}
 survival_df |> 
   pivot_longer(
-    cols = c(age, tumor_size, regional_node_examined, reginol_node_positive, survival_months),
+    cols = c(age, tumor_size, regional_node_examined, regional_node_positive, survival_months),
     names_to = "variable",
     values_to = "value"
   ) |>
@@ -295,14 +296,14 @@ ggplot(survival_df, aes(x = age, y = tumor_size, color = status)) +
 
 
 
-```{r positive_reginol_node_vs_survival_months_across_differentiate, echo=FALSE, fig.cap="Positive Reginol Node vs Survival Months Across Differentiate"}
-ggplot(survival_df, aes(x = reginol_node_positive, y = survival_months)) +
+```{r positive_regional_node_vs_survival_months_across_differentiate, echo=FALSE, fig.cap="Positive Regional Node vs Survival Months Across Differentiate"}
+ggplot(survival_df, aes(x = regional_node_positive, y = survival_months)) +
   geom_point(color = "light blue", size = 0.5, alpha = 0.5)  +
   facet_wrap(.~differentiate) +
   geom_smooth(method = "lm") +
   labs(
-    title = "Distribution of Positive Reginol Node and Survival Months by Differentiate",
-    x = "Positive Reginol Node",
+    title = "Distribution of Positive Regional Node and Survival Months by Differentiate",
+    x = "Positive Regional Node",
     y = "Survival Months"
   ) +
   theme_minimal()

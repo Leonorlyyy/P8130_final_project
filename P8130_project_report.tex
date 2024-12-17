@@ -110,9 +110,9 @@ This report was conducted using \texttt{survival\_data}, which contains
 information about breast cancer patients from a prospective study. The
 dimension of this dataset is 4024 rows and 16 columns. It contains five
 numeric variables, which are \texttt{age}, \texttt{tumor\_size},
-\texttt{regional\_node\_examined}, \texttt{reginol\_node\_positive}, and
-\texttt{survival\_months}, and eleven categorical variables, which are
-\texttt{race}, \texttt{marital\_status}, \texttt{t\_stage},
+\texttt{regional\_node\_examined}, \texttt{regional\_node\_positive},
+and \texttt{survival\_months}, and eleven categorical variables, which
+are \texttt{race}, \texttt{marital\_status}, \texttt{t\_stage},
 \texttt{n\_stage}, \texttt{x6th\_stage}, \texttt{differentiate},
 \texttt{grade}, \texttt{a\_stage}, \texttt{estrogen\_status},
 \texttt{progesterone\_status}, and \texttt{status}. Key variables in the
@@ -133,7 +133,8 @@ body remote from).
 \textbf{regional\_node\_examined}: The number of examined regional
 nodes.
 
-\textbf{regional\_node\_positive}: The number of positive reginol nodes.
+\textbf{regional\_node\_positive}: The number of positive regional
+nodes.
 
 \textbf{survival\_month}: The time of a patient with breast cancer is
 expected to live after their diagnosis (in months).
@@ -152,10 +153,10 @@ and 70 years old, and most of the survival time are larger than 45
 months. The number of examined regional nodes for most subjects are
 smaller than 30, and the subjects with nearly 12 examined regional nodes
 are the most. It is worth noting that the distributions of both
-variables \texttt{reginol\_node\_positive} and \texttt{tumor\_size} are
+variables \texttt{regional\_node\_positive} and \texttt{tumor\_size} are
 significantly skewed to the right. Over 2500 subjects only have 1 or 2
-positive reginol nodes, which is the most frequent number of positive
-reginol nodes. Most of the tumor sizes are smaller than 50 mm, and we
+positive regional nodes, which is the most frequent number of positive
+regional nodes. Most of the tumor sizes are smaller than 50 mm, and we
 can find that the most frequent size is around 19 mm, followed by around
 14 mm.
 
@@ -178,7 +179,7 @@ significant relationship between age and tumor size, the ``Dead'' group
 exhibits a pattern where larger tumors are associated with younger ages.
 According the figure 7, as it changes from undifferentiated to well
 differentiated, the negative correlation between the number of positive
-reginol nodes and the survival months becomes weaker.
+regional nodes and the survival months becomes weaker.
 
 \subsection{Conclusion/Discussion}\label{conclusiondiscussion}
 
@@ -258,7 +259,7 @@ Status & Dead & 616 & 0.1531 \\
 \end{figure}
 
 \begin{figure}
-\includegraphics[width=0.9\linewidth]{P8130_project_report_files/figure-latex/positive_reginol_node_vs_survival_months_across_differentiate-1} \caption{Positive Reginol Node vs Survival Months Across Differentiate}\label{fig:positive_reginol_node_vs_survival_months_across_differentiate}
+\includegraphics[width=0.9\linewidth]{P8130_project_report_files/figure-latex/positive_regional_node_vs_survival_months_across_differentiate-1} \caption{Positive Regional Node vs Survival Months Across Differentiate}\label{fig:positive_regional_node_vs_survival_months_across_differentiate}
 \end{figure}
 
 \end{document}

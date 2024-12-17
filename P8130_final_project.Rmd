@@ -43,7 +43,8 @@ theme_set(theme_minimal() + theme(legend.position = "bottom"))
 
 ```{r}
 survival_df = read_csv("data/Project_2_data.csv") |>
-  janitor::clean_names()
+  janitor::clean_names() |>
+  rename(regional_node_positive = reginol_node_positive)
 ```
 
 
@@ -53,7 +54,7 @@ survival_df = read_csv("data/Project_2_data.csv") |>
 str(survival_df)
 ```
 
-Numeric variables include `age`, `tumor_size`, `regional_node_examined`, `reginol_node_positive`, and `survival_months`.
+Numeric variables include `age`, `tumor_size`, `regional_node_examined`, `regional_node_positive`, and `survival_months`.
 
 These are continuous variables that can be used for our later regression analysis.
 
@@ -111,10 +112,10 @@ numeric_summary = survival_df |>
     regional_node_examined_Median = median(regional_node_examined, na.rm = TRUE),
     regional_node_examined_IQR = IQR(regional_node_examined, na.rm = TRUE),
     
-    reginol_node_positive_Mean = mean(reginol_node_positive, na.rm = TRUE),
-    reginol_node_positive_SD = sd(reginol_node_positive, na.rm = TRUE),
-    reginol_node_positive_Median = median(reginol_node_positive, na.rm = TRUE),
-    reginol_node_positive_IQR = IQR(reginol_node_positive, na.rm = TRUE),
+    regional_node_positive_Mean = mean(regional_node_positive, na.rm = TRUE),
+    regional_node_positive_SD = sd(regional_node_positive, na.rm = TRUE),
+    regional_node_positive_Median = median(regional_node_positive, na.rm = TRUE),
+    regional_node_positive_IQR = IQR(regional_node_positive, na.rm = TRUE),
     
     survival_months_Mean = mean(survival_months, na.rm = TRUE),
     survival_months_SD = sd(survival_months, na.rm = TRUE),
@@ -125,16 +126,16 @@ numeric_summary = survival_df |>
 numeric_table = data.frame(
   Variable = c("Age", "Tumor Size", "Regional Nodes Examined", "Regional Nodes Positive", "Survival Months"),
   Mean = c(numeric_summary$age_Mean, numeric_summary$tumor_size_Mean, 
-           numeric_summary$regional_node_examined_Mean, numeric_summary$reginol_node_positive_Mean, 
+           numeric_summary$regional_node_examined_Mean, numeric_summary$regional_node_positive_Mean, 
            numeric_summary$survival_months_Mean),
   SD = c(numeric_summary$age_SD, numeric_summary$tumor_size_SD, 
-         numeric_summary$regional_node_examined_SD, numeric_summary$reginol_node_positive_SD, 
+         numeric_summary$regional_node_examined_SD, numeric_summary$regional_node_positive_SD, 
          numeric_summary$survival_months_SD),
   Median = c(numeric_summary$age_Median, numeric_summary$tumor_size_Median, 
-             numeric_summary$regional_node_examined_Median, numeric_summary$reginol_node_positive_Median, 
+             numeric_summary$regional_node_examined_Median, numeric_summary$regional_node_positive_Median, 
              numeric_summary$survival_months_Median),
   IQR = c(numeric_summary$age_IQR, numeric_summary$tumor_size_IQR, 
-          numeric_summary$regional_node_examined_IQR, numeric_summary$reginol_node_positive_IQR, 
+          numeric_summary$regional_node_examined_IQR, numeric_summary$regional_node_positive_IQR, 
           numeric_summary$survival_months_IQR)
 )
 
@@ -235,7 +236,7 @@ This table shows the frequency of different levels of `status` by 6th stage.
 ```{r distribution_of_the_continuous_variables, echo=FALSE, fig.cap="Distribution of the Continuous Variables"}
 survival_df |> 
   pivot_longer(
-    cols = c(age, tumor_size, regional_node_examined, reginol_node_positive, survival_months),
+    cols = c(age, tumor_size, regional_node_examined, regional_node_positive, survival_months),
     names_to = "variable",
     values_to = "value"
   ) |>
@@ -249,7 +250,7 @@ survival_df |>
 
 Most patients are aged between 40 and 70 years. The data is well spread across middle and older age groups, making it possible for age-related analysis. Therefore, age will likely be a significant predictor for later analysis.
 
-Then is the distribution of different number of positive reginol node for each subject. Over 2500 subjects only have 1 or 2 positive reginol nodes, which is the most frequent number of positive reginol nodes. It is strongly right-skewed, so we will use the log transformation for this variable. 
+Then is the distribution of different number of positive regional node for each subject. Over 2500 subjects only have 1 or 2 positive regional nodes, which is the most frequent number of positive regional nodes. It is strongly right-skewed, so we will use the log transformation for this variable. 
 
 The third plot maps the frequency of different number of examined regional nodes for each subject. The number of examined regional nodes for most subjects are smaller than 30, and the subjects with nearly 12 examined regional nodes are the most.
 
@@ -351,23 +352,23 @@ This figure highlights the differences in tumor size distribution and trends wit
 
 
 
-## Positive Reginol Node vs Survival Months Across Differentiate
+## Positive Regional Node vs Survival Months Across Differentiate
 
 
-```{r positive_reginol_node_vs_survival_months_across_differentiate}, echo=FALSE, fig.cap="Positive Reginol Node vs Survival Months Across Differentiate"}
-ggplot(survival_df, aes(x = reginol_node_positive, y = survival_months)) +
+```{r positive_regional_node_vs_survival_months_across_differentiate}, echo=FALSE, fig.cap="Positive Regional Node vs Survival Months Across Differentiate"}
+ggplot(survival_df, aes(x = regional_node_positive, y = survival_months)) +
   geom_point(color = "light blue", size = 0.5, alpha = 0.5)  +
   facet_wrap(.~differentiate) +
   geom_smooth(method = "lm") +
   labs(
-    title = "Distribution of Positive Reginol Node and Survival Months by Differentiate",
-    x = "Positive Reginol Node",
+    title = "Distribution of Positive Regional Node and Survival Months by Differentiate",
+    x = "Positive Regional Node",
     y = "Survival Months"
   ) +
   theme_minimal()
 ```
 
-According to the trend lines, as it changes from undifferentiated to well differentiated, the negative correlation between the number of positive reginol nodes and the survival months becomes weaker. At the undifferentiated level, the correlation is strong. AS the number of positive reginol nodes increases, the survival months will decrease. 
+According to the trend lines, as it changes from undifferentiated to well differentiated, the negative correlation between the number of positive regional nodes and the survival months becomes weaker. At the undifferentiated level, the correlation is strong. AS the number of positive regional nodes increases, the survival months will decrease. 
 
 
 # Transformations
@@ -376,17 +377,17 @@ According to the trend lines, as it changes from undifferentiated to well differ
 survival_df = survival_df |>
   mutate(
     log_tumor_size = log(tumor_size),
-    log_reginol_node_positive = log(reginol_node_positive)
+    log_regional_node_positive = log(regional_node_positive)
   )
 ```
 
 
-Since variables `tumor_size` and `reginol_node_positive` are skewed to the right, we need to use the log transformation and add new variables `log_tumor_size` and `log_reginol_node_positive` for further analysis.
+Since variables `tumor_size` and `regional_node_positive` are skewed to the right, we need to use the log transformation and add new variables `log_tumor_size` and `log_regional_node_positive` for further analysis.
 
 ```{r}
 survival_df |> 
   pivot_longer(
-    cols = c(age, tumor_size, regional_node_examined, reginol_node_positive, survival_months),
+    cols = c(age, tumor_size, regional_node_examined, regional_node_positive, survival_months),
     names_to = "variable",
     values_to = "value"
   ) |>
@@ -406,7 +407,7 @@ survival_df =
 
 full_glm = glm(status ~ age + race + marital_status + t_stage + n_stage + x6th_stage +
                  differentiate + grade + a_stage + tumor_size + estrogen_status +
-                 progesterone_status + regional_node_examined + reginol_node_positive, 
+                 progesterone_status + regional_node_examined + regional_node_positive, 
                data = survival_df, family = binomial)
 
 alias(full_glm)$Complete %>%
@@ -439,7 +440,7 @@ However, since the AJCC system is complex and levels other than `IIIC` do not co
 ```{r forward}
 full_glm = glm(status ~ age + race + marital_status + t_stage + n_stage + x6th_stage +
                  differentiate + a_stage + tumor_size + estrogen_status +
-                 progesterone_status + regional_node_examined + reginol_node_positive, 
+                 progesterone_status + regional_node_examined + regional_node_positive, 
                data = survival_df, family = binomial)
 
 forward_glm = MASS::stepAIC(full_glm, direction = "forward", trace = FALSE)
@@ -506,7 +507,7 @@ Variance Inflation Factor is a commonly used method for detecting multicollinear
 
 The adjusted GVIF (i.e. GVIF^(1/(2*Df))) values are corrected for the degree of freedom and provide a scale similar to VIF. The high adjusted GVIF values (GVIF > 2) indicate the presence of moderate to strong multicollinearity.
 
-The table shows that most variables do not show multicollinearity, with the exception of `reginol_node_positive`. Since its adjusted GVIF is not much different from 2, we will keep this variable for now.
+The table shows that most variables do not show multicollinearity, with the exception of `regional_node_positive`. Since its adjusted GVIF is not much different from 2, we will keep this variable for now.
 
 ```{r}
 augment(final_glm) |>
@@ -560,7 +561,7 @@ glm_fit = function(data) {
   
   fit = glm(formula = status ~ age + race + marital_status + t_stage + n_stage + 
         differentiate + estrogen_status + progesterone_status + 
-        regional_node_examined + reginol_node_positive, 
+        regional_node_examined + regional_node_positive, 
         family = binomial, data = data)
   
   return(fit)
@@ -665,7 +666,7 @@ glm_inter_fit = function(data) {
   
   fit = glm(formula = status ~ age + race + marital_status + t_stage + n_stage + 
         differentiate + estrogen_status + progesterone_status + 
-        regional_node_examined + reginol_node_positive + age * race + marital_status * race, 
+        regional_node_examined + regional_node_positive + age * race + marital_status * race, 
         family = binomial, data = data)
   
   return(fit)
@@ -746,7 +747,7 @@ The limitation of KM curves and log-rank tests is that we can only test one vari
 cox_model = coxph(surv_obj ~ 
                     age + race + marital_status + t_stage + n_stage + x6th_stage +
                        differentiate + a_stage + tumor_size + estrogen_status +
-                       progesterone_status + regional_node_examined + reginol_node_positive, 
+                       progesterone_status + regional_node_examined + regional_node_positive, 
                   data = as.data.frame(survival_df))
 ```
 
@@ -766,7 +767,7 @@ We can see from the table that variable `a_stage`, `estrogen_status`, `progester
 
 ```{r forest_plot, fig.asp = 1.5, out.width="100%"}
 cox_new_model = coxph(surv_obj ~ age + race + marital_status + t_stage + n_stage + x6th_stage +
-                      differentiate + tumor_size + regional_node_examined + reginol_node_positive,
+                      differentiate + tumor_size + regional_node_examined + regional_node_positive,
                     data = as.data.frame(survival_df))
 
 ggforest(cox_new_model,
@@ -783,7 +784,7 @@ The risk of death is highest for patients with N stage N3, followed by N2, and f
 
 In the variable differentiated, the risk of death is significantly highest for undifferentiated, and then decreases in the order of poorly differentiated, moderately differentiated, and well differentiated.
 
-For the variables tumor size, regional node examined, and reginol node postive, we did not observe significant differences in the risk of death.
+For the variables tumor size, regional node examined, and regional node postive, we did not observe significant differences in the risk of death.
 
 
 
