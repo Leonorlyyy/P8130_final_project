@@ -1,11 +1,11 @@
 P8130_final_project
 ================
-Leonor Rui
+Yuechu Hu, Leyang Rui, Yifei Yu, Jinghan Zhao
 2024-12-03
 
-# Appendix
+# Preparing Data
 
-- Data Import
+## Data Import
 
 ``` r
 survival_df = read_csv("data/Project_2_data.csv") |>
@@ -13,7 +13,7 @@ survival_df = read_csv("data/Project_2_data.csv") |>
   rename(regional_node_positive = reginol_node_positive)
 ```
 
-- Data Description
+## Data Description
 
 ``` r
 str(survival_df)
@@ -126,98 +126,53 @@ summary(survival_df)
     ##  3rd Qu.: 5.000         3rd Qu.: 90.0               
     ##  Max.   :46.000         Max.   :107.0
 
-## Descriptive table for numerical variables
+## Data Dictionary
 
-``` r
-numeric_summary = survival_df |> 
-  summarize(
-    age_Mean = mean(age, na.rm = TRUE),
-    age_SD = sd(age, na.rm = TRUE),
-    age_Median = median(age, na.rm = TRUE),
-    age_IQR = IQR(age, na.rm = TRUE),
-    
-    tumor_size_Mean = mean(tumor_size, na.rm = TRUE),
-    tumor_size_SD = sd(tumor_size, na.rm = TRUE),
-    tumor_size_Median = median(tumor_size, na.rm = TRUE),
-    tumor_size_IQR = IQR(tumor_size, na.rm = TRUE),
-    
-    regional_node_examined_Mean = mean(regional_node_examined, na.rm = TRUE),
-    regional_node_examined_SD = sd(regional_node_examined, na.rm = TRUE),
-    regional_node_examined_Median = median(regional_node_examined, na.rm = TRUE),
-    regional_node_examined_IQR = IQR(regional_node_examined, na.rm = TRUE),
-    
-    regional_node_positive_Mean = mean(regional_node_positive, na.rm = TRUE),
-    regional_node_positive_SD = sd(regional_node_positive, na.rm = TRUE),
-    regional_node_positive_Median = median(regional_node_positive, na.rm = TRUE),
-    regional_node_positive_IQR = IQR(regional_node_positive, na.rm = TRUE),
-    
-    survival_months_Mean = mean(survival_months, na.rm = TRUE),
-    survival_months_SD = sd(survival_months, na.rm = TRUE),
-    survival_months_Median = median(survival_months, na.rm = TRUE),
-    survival_months_IQR = IQR(survival_months, na.rm = TRUE)
-  )
+**age**: The age of the patient (in years).
 
-numeric_table = data.frame(
-  Variable = c("Age", "Tumor Size", "Regional Nodes Examined", "Regional Nodes Positive", "Survival Months"),
-  Mean = c(numeric_summary$age_Mean, numeric_summary$tumor_size_Mean, 
-           numeric_summary$regional_node_examined_Mean, numeric_summary$regional_node_positive_Mean, 
-           numeric_summary$survival_months_Mean),
-  SD = c(numeric_summary$age_SD, numeric_summary$tumor_size_SD, 
-         numeric_summary$regional_node_examined_SD, numeric_summary$regional_node_positive_SD, 
-         numeric_summary$survival_months_SD),
-  Median = c(numeric_summary$age_Median, numeric_summary$tumor_size_Median, 
-             numeric_summary$regional_node_examined_Median, numeric_summary$regional_node_positive_Median, 
-             numeric_summary$survival_months_Median),
-  IQR = c(numeric_summary$age_IQR, numeric_summary$tumor_size_IQR, 
-          numeric_summary$regional_node_examined_IQR, numeric_summary$regional_node_positive_IQR, 
-          numeric_summary$survival_months_IQR)
-)
+**race**: The race of the patient, categorized as “Black”, “Other”, or
+“White”.
 
-categorical_table = survival_df |> 
-  summarize(
-    estrogen_status_Positive = sum(estrogen_status == "Positive", na.rm = TRUE),
-    estrogen_status_Negative = sum(estrogen_status == "Negative", na.rm = TRUE),
-    progesterone_status_Positive = sum(progesterone_status == "Positive", na.rm = TRUE),
-    progesterone_status_Negative = sum(progesterone_status == "Negative", na.rm = TRUE),
-    status_Alive = sum(status == "Alive", na.rm = TRUE),
-    status_Dead = sum(status == "Dead", na.rm = TRUE)
-  )
+**marital_status**: The marital status of the patient, categorized as
+“Divorced”, “Married”, “Separated”, “Single”, or “Widowed”.
 
-categorical_long = data.frame(
-  Variable = c("Estrogen Status Positive", "Estrogen Status Negative",
-               "Progesterone Status Positive", "Progesterone Status Negative",
-               "Status Alive", "Status Dead"),
-  Count = c(categorical_table$estrogen_status_Positive, categorical_table$estrogen_status_Negative,
-            categorical_table$progesterone_status_Positive, categorical_table$progesterone_status_Negative,
-            categorical_table$status_Alive, categorical_table$status_Dead),
-  Proportion = round(c(
-    categorical_table$estrogen_status_Positive / nrow(survival_df),
-    categorical_table$estrogen_status_Negative / nrow(survival_df),
-    categorical_table$progesterone_status_Positive / nrow(survival_df),
-    categorical_table$progesterone_status_Negative / nrow(survival_df),
-    categorical_table$status_Alive / nrow(survival_df),
-    categorical_table$status_Dead / nrow(survival_df)
-  ), 4)
-)
+**t_stage**: Adjusted AJCC 6th T, categorized as “T1”, “T2”, “T3”, or
+“T4”.
 
-categorical_long = categorical_long |> 
-  separate(Variable, into = c("Variable Name", "Level"), sep = " (?=Positive|Negative|Alive|Dead)")
+**n_stage**: Adjusted AJCC 6th N, categorized as “N1”, “N2”, or “N3”.
 
-final_table = list(
-  Numeric_Summary = numeric_table,
-  Categorical_Summary = categorical_long
-)
+**x6th_stage**: Breast Adjusted AJCC 6th Stage, categorized as “IIA”,
+“IIB”, “IIIA”, “IIIB”, or “IIIC”.
 
+**differentiate**: Tumor differentiation grade, categorized as “Well
+differentiated”, “Moderately differentiated”, “Poorly differentiated”,
+or “Undifferentiated”.
 
-cat("### Numeric Variables Summary\n")
-```
+**grade**: Tumor differentiation grade, categorized as “1”, “2”, “3”, or
+“anaplastic; Grade IV”.
 
-    ## ### Numeric Variables Summary
+**a_stage**: Categorized as “Regional” (a neoplasm that has extended) or
+“Distant” (a neoplasm that has spread to parts of the body remote from).
 
-``` r
-knitr::kable(numeric_table, col.names = c("Variable Name", "Mean", "SD", "Median", "IQR"), 
-             caption = "Summary Statistics for Numeric Variables", format = "pipe")
-```
+**tumor_size**: The size of tumor (in millimeters).
+
+**estrogen_status**: The status of the patient’s estrogen, categorized
+as “Negative”, or “Positive”.
+
+**progesterone_status**: The status of the patient’s progesterone,
+categorized as “Negative”, or “Positive”.
+
+**regional_node_examined**: The number of examined regional nodes.
+
+**regional_node_positive**: The number of positive regional nodes.
+
+**survival_month**: The time of a patient with breast cancer is expected
+to live after their diagnosis (in months).
+
+**status**: The status of the patient, categorized as “Alive”, or
+“Dead”.
+
+## Descriptive Tables
 
 | Variable Name           |      Mean |        SD | Median | IQR |
 |:------------------------|----------:|----------:|-------:|----:|
@@ -229,26 +184,44 @@ knitr::kable(numeric_table, col.names = c("Variable Name", "Mean", "SD", "Median
 
 Summary Statistics for Numeric Variables
 
-``` r
-cat("\n### Categorical Variables Summary\n")
-```
-
-    ## 
-    ## ### Categorical Variables Summary
-
-``` r
-knitr::kable(categorical_long, col.names = c("Variable Name", "Level", "Count", "Proportion"), 
-             caption = "Summary Statistics for Categorical Variables", format = "pipe")
-```
-
-| Variable Name       | Level    | Count | Proportion |
-|:--------------------|:---------|------:|-----------:|
-| Estrogen Status     | Positive |  3755 |     0.9332 |
-| Estrogen Status     | Negative |   269 |     0.0668 |
-| Progesterone Status | Positive |  3326 |     0.8265 |
-| Progesterone Status | Negative |   698 |     0.1735 |
-| Status              | Alive    |  3408 |     0.8469 |
-| Status              | Dead     |   616 |     0.1531 |
+| Variable Name       | Level            | Count | Proportion |
+|:--------------------|:-----------------|------:|-----------:|
+| Race                | Black            |   291 |     0.0723 |
+| Race                | White            |  3413 |     0.8482 |
+| Race                | Other            |   320 |     0.0795 |
+| Marital Status      | Divorced         |   486 |     0.1208 |
+| Marital Status      | Married          |  2643 |     0.6568 |
+| Marital Status      | Separated        |    45 |     0.0112 |
+| Marital Status      | Single           |   615 |     0.1528 |
+| Marital Status      | Widowed          |   235 |     0.0584 |
+| T Stage             | T1               |  1603 |     0.3984 |
+| T Stage             | T2               |  1786 |     0.4438 |
+| T Stage             | T3               |   533 |     0.1325 |
+| T Stage             | T4               |   102 |     0.0253 |
+| N Stage             | N1               |  2732 |     0.6789 |
+| N Stage             | N2               |   820 |     0.2038 |
+| N Stage             | N3               |   472 |     0.1173 |
+| 6th Stage           | IIA              |  1305 |     0.3243 |
+| 6th Stage           | IIB              |  1130 |     0.2808 |
+| 6th Stage           | IIIA             |  1050 |     0.2609 |
+| 6th Stage           | IIIB             |    67 |     0.0167 |
+| 6th Stage           | IIIC             |   472 |     0.1173 |
+| Differentiate       | Well             |   543 |     0.1349 |
+| Differentiate       | Moderate         |  2351 |     0.5842 |
+| Differentiate       | Poor             |  1111 |     0.2761 |
+| Differentiate       | Undifferentiated |    19 |     0.0047 |
+| Grade               | 1                |   543 |     0.1349 |
+| Grade               | 2                |  2351 |     0.5842 |
+| Grade               | 3                |  1111 |     0.2761 |
+| Grade               | 4                |     0 |     0.0000 |
+| A Stage             | Distant          |    92 |     0.0229 |
+| A Stage             | Regional         |  3932 |     0.9771 |
+| Estrogen Status     | Positive         |  3755 |     0.9332 |
+| Estrogen Status     | Negative         |   269 |     0.0668 |
+| Progesterone Status | Positive         |  3326 |     0.8265 |
+| Progesterone Status | Negative         |   698 |     0.1735 |
+| Status              | Alive            |  3408 |     0.8469 |
+| Status              | Dead             |   616 |     0.1531 |
 
 Summary Statistics for Categorical Variables
 
@@ -333,8 +306,6 @@ survival_df |>
 This table shows the frequency of different levels of `status` by 6th
 stage.
 
-- Data Visualization
-
 # Distributions of the numeric variables
 
 <div class="figure">
@@ -376,9 +347,9 @@ right-skewed, so we will use the log transformation for this variable.
 
 <div class="figure">
 
-<img src="P8130_final_project_files/figure-gfm/survival_months_by_status-1.png" alt="Survival_Months_by_Status" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/survival_months_by_status-1.png" alt="Survival Months by Status" width="90%" />
 <p class="caption">
-Survival_Months_by_Status
+Survival Months by Status
 </p>
 
 </div>
@@ -395,9 +366,9 @@ for the Alive group compared to the Dead group.
 
 <div class="figure">
 
-<img src="P8130_final_project_files/figure-gfm/tumor_sizes_by_t_stage-1.png" alt="Tumor Sizes by T_stage" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/tumor_sizes_by_t_stage-1.png" alt="Tumor Sizes by T-stage" width="90%" />
 <p class="caption">
-Tumor Sizes by T_stage
+Tumor Sizes by T-stage
 </p>
 
 </div>
@@ -413,9 +384,9 @@ stage and T3 stage.
 
 <div class="figure">
 
-<img src="P8130_final_project_files/figure-gfm/survival_months_by_a_stage_based_on_status-1.png" alt="Survival Months by A_stage Based on Status" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/survival_months_by_a_stage_based_on_status-1.png" alt="Survival Months by A-stage Based on Status" width="90%" />
 <p class="caption">
-Survival Months by A_stage Based on Status
+Survival Months by A-stage Based on Status
 </p>
 
 </div>
@@ -465,7 +436,7 @@ larger tumors are associated with younger ages.
 
 <div class="figure">
 
-<img src="P8130_final_project_files/figure-gfm/positive_regional_node_vs_survival_months_across_differentiate}-1.png" alt="Positive Regional Node vs Survival Months Across Differentiate" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/positive regional node vs survival months across differentiate-1.png" alt="Positive Regional Node vs Survival Months Across Differentiate" width="90%" />
 <p class="caption">
 Positive Regional Node vs Survival Months Across Differentiate
 </p>
@@ -491,20 +462,6 @@ survival_df = survival_df |>
 Since variables `tumor_size` and `regional_node_positive` are skewed to
 the right, we need to use the log transformation and add new variables
 `log_tumor_size` and `log_regional_node_positive` for further analysis.
-
-``` r
-survival_df |> 
-  pivot_longer(
-    cols = c(age, tumor_size, regional_node_examined, regional_node_positive, survival_months),
-    names_to = "variable",
-    values_to = "value"
-  ) |>
-  ggplot(aes(x = value)) +
-  geom_histogram() +
-  facet_wrap(variable ~ .,  scales = "free")
-```
-
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-10-1.png" width="90%" />
 
 # Model Building
 
@@ -778,7 +735,7 @@ augment(final_glm) |>
 
 <div class="figure">
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-12-1.png" alt="Residual versus Fitted Values Plot" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-13-1.png" alt="Residual versus Fitted Values Plot" width="90%" />
 <p class="caption">
 Residual versus Fitted Values Plot
 </p>
@@ -795,7 +752,7 @@ augment_quantile(final_glm) |>
 
 <div class="figure">
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-13-1.png" alt="Random Quantile Residual versus Fitted Values Plot" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-14-1.png" alt="Random Quantile Residual versus Fitted Values Plot" width="90%" />
 <p class="caption">
 Random Quantile Residual versus Fitted Values Plot
 </p>
@@ -815,7 +772,7 @@ plot(final_glm, which = 5)
 
 <div class="figure">
 
-<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-14-1.png" alt="Residual versus Leverage Plot" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/unnamed-chunk-15-1.png" alt="Residual versus Leverage Plot" width="90%" />
 <p class="caption">
 Residual versus Leverage Plot
 </p>
@@ -843,28 +800,28 @@ final_glm_df %>%
   knitr::kable(digits = 4, caption = "Final Model Results with Adjusted-Odds Ratio", format = "pipe")
 ```
 
-|  | estimate | std_error | z_value | p_value | adjusted_odds_ratio |
-|:---|---:|---:|---:|---:|---:|
-| (Intercept) | -2.2838 | 0.4385 | -5.2085 | 0.0000 | 0.1019 |
-| age | 0.0238 | 0.0056 | 4.2426 | 0.0000 | 1.0241 |
-| raceOther | -0.9346 | 0.2485 | -3.7616 | 0.0002 | 0.3928 |
-| raceWhite | -0.5148 | 0.1617 | -3.1845 | 0.0014 | 0.5976 |
-| marital_statusMarried | -0.2110 | 0.1416 | -1.4900 | 0.1362 | 0.8097 |
-| marital_statusSeparated | 0.6691 | 0.3881 | 1.7240 | 0.0847 | 1.9526 |
-| marital_statusSingle | -0.0646 | 0.1748 | -0.3696 | 0.7117 | 0.9374 |
-| marital_statusWidowed | 0.0175 | 0.2211 | 0.0791 | 0.9369 | 1.0176 |
-| t_stageT2 | 0.4111 | 0.1130 | 3.6372 | 0.0003 | 1.5085 |
-| t_stageT3 | 0.5516 | 0.1488 | 3.7077 | 0.0002 | 1.7360 |
-| t_stageT4 | 1.0988 | 0.2445 | 4.4934 | 0.0000 | 3.0005 |
-| n_stageN2 | 0.4363 | 0.1284 | 3.3987 | 0.0007 | 1.5470 |
-| n_stageN3 | 0.5872 | 0.2345 | 2.5034 | 0.0123 | 1.7989 |
-| differentiateModerately differentiated | 0.5328 | 0.1838 | 2.8990 | 0.0037 | 1.7036 |
-| differentiatePoorly differentiated | 0.9190 | 0.1924 | 4.7772 | 0.0000 | 2.5069 |
-| differentiateUndifferentiated | 1.8649 | 0.5538 | 3.3672 | 0.0008 | 6.4551 |
-| estrogen_statusPositive | -0.7480 | 0.1775 | -4.2140 | 0.0000 | 0.4733 |
-| progesterone_statusPositive | -0.5842 | 0.1275 | -4.5811 | 0.0000 | 0.5576 |
-| regional_node_examined | -0.0359 | 0.0072 | -5.0110 | 0.0000 | 0.9647 |
-| regional_node_positive | 0.0797 | 0.0153 | 5.2076 | 0.0000 | 1.0829 |
+|                                        | estimate | std_error | z_value | p_value | adjusted_odds_ratio |
+|:---------------------------------------|---------:|----------:|--------:|--------:|--------------------:|
+| (Intercept)                            |  -2.2838 |    0.4385 | -5.2085 |  0.0000 |              0.1019 |
+| age                                    |   0.0238 |    0.0056 |  4.2426 |  0.0000 |              1.0241 |
+| raceOther                              |  -0.9346 |    0.2485 | -3.7616 |  0.0002 |              0.3928 |
+| raceWhite                              |  -0.5148 |    0.1617 | -3.1845 |  0.0014 |              0.5976 |
+| marital_statusMarried                  |  -0.2110 |    0.1416 | -1.4900 |  0.1362 |              0.8097 |
+| marital_statusSeparated                |   0.6691 |    0.3881 |  1.7240 |  0.0847 |              1.9526 |
+| marital_statusSingle                   |  -0.0646 |    0.1748 | -0.3696 |  0.7117 |              0.9374 |
+| marital_statusWidowed                  |   0.0175 |    0.2211 |  0.0791 |  0.9369 |              1.0176 |
+| t_stageT2                              |   0.4111 |    0.1130 |  3.6372 |  0.0003 |              1.5085 |
+| t_stageT3                              |   0.5516 |    0.1488 |  3.7077 |  0.0002 |              1.7360 |
+| t_stageT4                              |   1.0988 |    0.2445 |  4.4934 |  0.0000 |              3.0005 |
+| n_stageN2                              |   0.4363 |    0.1284 |  3.3987 |  0.0007 |              1.5470 |
+| n_stageN3                              |   0.5872 |    0.2345 |  2.5034 |  0.0123 |              1.7989 |
+| differentiateModerately differentiated |   0.5328 |    0.1838 |  2.8990 |  0.0037 |              1.7036 |
+| differentiatePoorly differentiated     |   0.9190 |    0.1924 |  4.7772 |  0.0000 |              2.5069 |
+| differentiateUndifferentiated          |   1.8649 |    0.5538 |  3.3672 |  0.0008 |              6.4551 |
+| estrogen_statusPositive                |  -0.7480 |    0.1775 | -4.2140 |  0.0000 |              0.4733 |
+| progesterone_statusPositive            |  -0.5842 |    0.1275 | -4.5811 |  0.0000 |              0.5576 |
+| regional_node_examined                 |  -0.0359 |    0.0072 | -5.0110 |  0.0000 |              0.9647 |
+| regional_node_positive                 |   0.0797 |    0.0153 |  5.2076 |  0.0000 |              1.0829 |
 
 Final Model Results with Adjusted-Odds Ratio
 
@@ -934,12 +891,6 @@ by log loss and AUC. The mean of log loss is 0.3723182, and the mean of
 AUC is 0.7422428.
 
 ### Evaluation Across Races
-
-- Evaluate the performance of your model(s). Is your model achieving
-  similar performance between the majority race group “White” and the
-  minority “Black” (or “Black” + “Other”)? If not, could you try to
-  improve the fairness (i.e., reducing the gap of prediction performance
-  between the majority and minority) of your model(s)?
 
 ``` r
 race_combine_df = 
@@ -1031,7 +982,7 @@ race_combine_df %>%
 
 <div class="figure">
 
-<img src="P8130_final_project_files/figure-gfm/race_inter_marital}-1.png" alt="Survival Months Distribution by Marital Status in Race Groups" width="90%" />
+<img src="P8130_final_project_files/figure-gfm/race_inter_marital-1.png" alt="Survival Months Distribution by Marital Status in Race Groups" width="90%" />
 <p class="caption">
 Survival Months Distribution by Marital Status in Race Groups
 </p>
@@ -1242,27 +1193,27 @@ and a HR lower than 1 decreases it. The smaller the p-value is the
 stronger the weight of evidence that the two groups are different.
 
 We can conclude from the plot that for the variable race, blacks have
-the highest risk of death, followed by whites, while the lowest
+the highest hazard of death, followed by whites, while the lowest
 mortality rate is for other ethnic groups. In the variable marital
-status, the risk of death is significantly higher for separated people,
-but this may be due to information bias caused by fewer observations.
-The confidence intervals for the other categories of marital status all
-contain the null hypothesis, meaning that there is no significant
-difference.
+status, the hazard of death is significantly higher for separated
+people, but this may be due to information bias caused by fewer
+observations. The confidence intervals for the other categories of
+marital status all contain the null hypothesis, meaning that there is no
+significant difference.
 
-The risk of death is highest for patients with N stage N3, followed by
+The hazard of death is highest for patients with N stage N3, followed by
 N2, and finally N1. Differently, although T stage also shows a similar
 trend, the confidence intervals of each stage level contain the null
 hypothesis, meaning that there is no significant difference between
-levels. For the 6th stage, IIIB has the highest risk of death, followed
-by IIB, and then IIA, but there is no significant difference. For stage
-IIIC, since it contains the same information as N3 of N stage, no
-comparison is made in this variable.
+levels. For the 6th stage, IIIB has the highest hazard of death,
+followed by IIB, and then IIA, but there is no significant difference.
+For stage IIIC, since it contains the same information as N3 of N stage,
+no comparison is made in this variable.
 
-In the variable differentiated, the risk of death is significantly
+In the variable differentiated, the hazard of death is significantly
 highest for undifferentiated, and then decreases in the order of poorly
 differentiated, moderately differentiated, and well differentiated.
 
 For the variables tumor size, regional node examined, and regional node
-postive, we did not observe significant differences in the risk of
+postive, we did not observe significant differences in the hazard of
 death.

@@ -1,11 +1,14 @@
 ---
-title: "P8130_final_project"
-author: "Yuechu Hu, Leyang Rui, Yifei Yu, Jinghan Zhao"
-date: "2024-12-03"
-output:
-  github_document
+title: "Appendix"
+output: 
+  pdf_document:
+    keep_tex: true
 editor_options:
   chunk_output_type: console
+  fontsize: 12pt
+header-includes:
+  - \usepackage{setspace}
+  - \doublespacing
 ---
 
 ```{r setup, include=FALSE}
@@ -31,40 +34,15 @@ knitr::opts_chunk$set(
   fig.asp = .6,
   out.width = "90%",
   warning = FALSE,
-  message = FALSE
+  message = FALSE,
+  echo = FALSE
 )
 
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
-```
 
-# Preparing Data
-
-## Data Import
-
-```{r}
 survival_df = read_csv("data/Project_2_data.csv") |>
   janitor::clean_names() |>
-  rename(regional_node_positive = reginol_node_positive)
-```
-
-
-## Data Description
-
-```{r}
-str(survival_df)
-```
-
-Numeric variables include `age`, `tumor_size`, `regional_node_examined`, `regional_node_positive`, and `survival_months`.
-
-These are continuous variables that can be used for our later regression analysis.
-
-Categorical variables include `race`, `marital_status`, `t_stage`, `n_stage`, `x6th_stage`, `differentiate`, `grade`, `a_stage`, `estrogen_status`, `progesterone_status`, and `status`.
-
-Then we will convert these variables into factors.
-
-
-```{r}
-survival_df = survival_df |>
+  rename(regional_node_positive = reginol_node_positive) |>
   mutate(
     race = factor(race),
     marital_status = factor(marital_status),
@@ -87,55 +65,40 @@ survival_df = survival_df |>
   )
 ```
 
+## Descriptive Tables
 
-```{r}
-summary(survival_df)
+```{r data_dictionary}
+data_dict = 
+  tibble(
+  Variable = c("age", "race", "marital_status", "t_stage", "n_stage", "x6th_stage", "differentiate", "grade",
+               "a_stage", "tumor_size", "estrogen_status", "progesterone_status", "regional_node_examined", 
+               "regional_node_positive", "survival_month", "status"),
+  Description = c(
+    "The age of the patient (in years)",
+    "The race of the patient, categorized as Black, White or Other",
+    "The marital status of the patient, categorized as Divorced, Married, Separated, Single, or Widowed",
+    "Adjusted AJCC 6th T, categorized as T1, T2, T3, or T4",
+    "Adjusted AJCC 6th N, categorized as N1, N2, or N3",
+    "Breast Adjusted AJCC 6th Stage, categorized as IIA, IIB, IIIA, IIIB, or IIIC",
+    "Tumor differentiation grade, categorized as Well differentiated, Moderately differentiated, Poorly differentiated, or Undifferentiated",
+    "Tumor differentiation grade, categorized as 1, 2, 3, or anaplastic; Grade IV",
+    "Categorized as Regional (a neoplasm that has extended) or Distant (a neoplasm that has spread to parts of the body remote from)",
+    "The size of tumor (in millimeters)",
+    "The status of the patient's estrogen, categorized as Positive or Negative",
+    "The status of the patient's progesterone, categorized as Positive or Negative",
+    "The number of examined regional nodes",
+    "The number of positive regional nodes",
+    "The time of a patient with breast cancer is expected to live after their diagnosis (in months)",
+    "The status of the patient, categorized as Alive or Dead"
+  )
+)
+
+data_dict %>% 
+  knitr::kable(caption = "Data Dictionary")
 ```
 
 
-## Data Dictionary
-
-
-**age**: The age of the patient (in years).
-
-**race**: The race of the patient, categorized as "Black", "Other", or "White".
-
-**marital_status**: The marital status of the patient, categorized as "Divorced", "Married", "Separated", "Single", or "Widowed".
-
-**t_stage**: Adjusted AJCC 6th T, categorized as "T1", "T2", "T3", or "T4".
-
-**n_stage**: Adjusted AJCC 6th N, categorized as "N1", "N2", or "N3".
-
-**x6th_stage**: Breast Adjusted AJCC 6th Stage, categorized as "IIA", "IIB", "IIIA", "IIIB", or "IIIC".
-
-**differentiate**: Tumor differentiation grade, categorized as "Well differentiated", "Moderately differentiated", "Poorly differentiated", or "Undifferentiated".
-
-**grade**: Tumor differentiation grade, categorized as "1", "2", "3", or "anaplastic; Grade IV".
-
-**a_stage**: Categorized as "Regional" (a neoplasm that has extended) or "Distant" (a neoplasm that has spread to
-parts of the body remote from).
-
-**tumor_size**: The size of tumor (in millimeters).
-
-**estrogen_status**: The status of the patient's estrogen, categorized as "Negative", or "Positive".
-
-**progesterone_status**: The status of the patient's progesterone, categorized as "Negative", or "Positive".
-
-**regional_node_examined**: The number of examined regional nodes.
-
-**regional_node_positive**: The number of positive regional nodes.
-
-**survival_month**: The time of a patient with breast cancer is expected to live after their diagnosis (in months).
-
-**status**: The status of the patient, categorized as "Alive", or "Dead".
-
-
-
-
-## Descriptive Tables
-
 ```{r, echo=FALSE}
-
 numeric_summary = survival_df |> 
   summarize(
     age_Mean = mean(age, na.rm = TRUE),
@@ -296,53 +259,11 @@ knitr::kable(numeric_table, col.names = c("Variable Name", "Mean", "SD", "Median
 ```{r, echo=FALSE}
 knitr::kable(categorical_long, col.names = c("Variable Name", "Level", "Count", "Proportion"), 
              caption = "Summary Statistics for Categorical Variables", format = "pipe")
-
 ```
 
+\newpage
 
-The majority of patients in the dataset are White, accounting for approximately 84.82% of the total population. Black patients make up 7.23%, and patients classified as "Other" constitute 7.95%. This imbalance suggests that the dataset is heavily skewed towards White patients, which could influence the generalizability of the findings to other racial groups. 
-
-
-The wide range of values in variables such as `tumor_size`, `regional_node_examined`, and `survival_months` indicates the need to explore relationships and their potential nonlinearities with survival, giving us a possible analytical regression model.
-
-Since the two variables `grade` and `differentiate` represent the same variable with different names, we will not consider the variable `grade` in the further analysis.
-
-
-```{r}
-colSums(is.na(survival_df))
-```
-
-We can conclude that no missing values are present in this dataset across all variables.
-
-
-```{r}
-survival_df |>
-  group_by(differentiate, race) |>
-  summarise(count = n(), .groups = "drop") |>
-  pivot_wider(
-    names_from = differentiate,
-    values_from = count,
-    values_fill = list(count = 0)
-  )
-```
-
-This table shows the frequency of different levels of `differentiate` by races.
-
-
-```{r}
-survival_df |>
-  group_by(x6th_stage, status) |>
-  summarise(count = n(), .groups = "drop") |>
-  pivot_wider(
-    names_from = status,
-    values_from = count
-  )
-```
-
-This table shows the frequency of different levels of `status` by 6th stage.
-
-
-# Distributions of the numeric variables
+## Exploratory Analysis
 
 ```{r distribution_of_the_continuous_variables, echo=FALSE, fig.cap="Distribution of the Continuous Variables"}
 survival_df |> 
@@ -359,21 +280,6 @@ survival_df |>
          y = "Frequency")
 ```
 
-Most patients are aged between 40 and 70 years. The data is well spread across middle and older age groups, making it possible for age-related analysis. Therefore, age will likely be a significant predictor for later analysis.
-
-Then is the distribution of different number of positive regional node for each subject. Over 2500 subjects only have 1 or 2 positive regional nodes, which is the most frequent number of positive regional nodes. It is strongly right-skewed, so we will use the log transformation for this variable. 
-
-The third plot maps the frequency of different number of examined regional nodes for each subject. The number of examined regional nodes for most subjects are smaller than 30, and the subjects with nearly 12 examined regional nodes are the most.
-
-Then is the distribution of the survival months, most of the survival time are larger than 45 months.
-
-The last one is the distribution of all tumor sizes, and most of the tumor sizes are smaller than 50 mm. We can find that the most frequent size is around 19 mm, followed by around 14 mm. This distribution is right-skewed, so we will use the log transformation for this variable.
-
-
-# Bewteen Variables 
-
-
-## Survival Months by Status
 
 ```{r survival_months_by_status, echo=FALSE, fig.cap="Survival Months by Status"}
 ggplot(survival_df, aes(x = status, y = survival_months)) + 
@@ -382,12 +288,8 @@ ggplot(survival_df, aes(x = status, y = survival_months)) +
   theme_minimal()
 ```
 
-The Alive group has a higher median survival time (approximately 75 months) with a relatively narrow interquartile range. However, there are several outliers below 15 survival months, indicating cases of unusually short survival. In contrast, the Dead group has a lower median survival time (around 45 months) with a wider interquartile range, reflecting greater variability. Overall, survival months are significantly higher for the Alive group compared to the Dead group.
 
-
-## Tumor Sizes by T_stage
-
-```{r tumor_sizes_by_t_stage, echo=FALSE, fig.cap="Tumor Sizes by T-stage"}
+```{r tumor_sizes_by_t_stage, echo=FALSE, fig.cap="Tumor Sizes by T stage"}
 ggplot(survival_df, aes(x = tumor_size, y = t_stage)) +
   geom_boxplot(fill = "light blue") +
   scale_x_continuous(breaks = seq(0, max(survival_df$tumor_size, na.rm = TRUE), by = 10)) +
@@ -398,12 +300,8 @@ ggplot(survival_df, aes(x = tumor_size, y = t_stage)) +
   )
 ```
 
-In this plot, we explore the tumor size distribution at different T stages. From T1 to T3, as the stage changes, both the mean tumor sizes and IQR become larger. At T4 stage, the IQR of tumor sizes is much larger than others, and the mean size is smaller than the mean size at T3 stage. We notice that there are some potential outliers both ar T1 stage and T3 stage.
 
-
-## Survival Months by A_stage Based on Status
-
-```{r survival_months_by_a_stage_based_on_status, echo=FALSE, fig.cap="Survival Months by A-stage Based on Status"}
+```{r survival_months_by_a_stage_based_on_status, echo=FALSE, fig.cap="Survival Months by A stage Based on Status"}
 ggplot(survival_df, aes(x = survival_months, y = a_stage)) +
   geom_boxplot(fill = "light blue") +
   scale_x_continuous(breaks = seq(0, max(survival_df$survival_months, na.rm = TRUE), by = 10)) +
@@ -415,11 +313,6 @@ ggplot(survival_df, aes(x = survival_months, y = a_stage)) +
   facet_grid(~ status)
 ```
 
-In the Regional stage, the Alive group has a higher median survival with outliers below 15 months, while the Dead group shows a lower median with no outliers. For the Distant stage, survival times are shorter overall, with the Alive group having a median of 80 months and the Dead group around 30 months, both without significant outliers. Overall, survival is longer in the Regional stage, and the Alive group shows higher survival times across both stages.
-
-
-
-## Tumor Size by Differentiate
 
 ```{r tumor_size_by_differentiate, echo=FALSE, fig.cap="Tumor Size by Differentiate"}
 ggplot(survival_df, aes(x = differentiate, y = tumor_size)) +
@@ -431,11 +324,6 @@ ggplot(survival_df, aes(x = differentiate, y = tumor_size)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-
-The Undifferentiated group has larger tumor sizes compared to the other categories, while the Well, Moderately, and Poorly differentiated groups show similar distributions with many smaller tumors and numerous high-value outliers.
-
-
-## Relationship Between Age and Tumor Size across Status
 
 ```{r relationship_between_age_and_tumor_size_across_status, echo=FALSE, fig.cap="Relationship Between Age and Tumor Size across Status"}
 ggplot(survival_df, aes(x = age, y = tumor_size, color = status)) +
@@ -450,14 +338,8 @@ ggplot(survival_df, aes(x = age, y = tumor_size, color = status)) +
 
 ```
 
-This figure highlights the differences in tumor size distribution and trends with age between individuals who are alive and those who are deceased. While the "Alive" group shows no significant relationship between age and tumor size, the "Dead" group exhibits a pattern where larger tumors are associated with younger ages. 
 
-
-
-## Positive Regional Node vs Survival Months Across Differentiate
-
-
-```{r positive regional node vs survival months across differentiate, echo=FALSE, fig.cap="Positive Regional Node vs Survival Months Across Differentiate"}
+```{r positive_regional_node_vs_survival_months_across_differentiate, echo=FALSE, fig.cap="Positive Regional Node vs Survival Months Across Differentiate"}
 ggplot(survival_df, aes(x = regional_node_positive, y = survival_months)) +
   geom_point(color = "light blue", size = 0.5, alpha = 0.5)  +
   facet_wrap(.~differentiate) +
@@ -470,64 +352,20 @@ ggplot(survival_df, aes(x = regional_node_positive, y = survival_months)) +
   theme_minimal()
 ```
 
-According to the trend lines, as it changes from undifferentiated to well differentiated, the negative correlation between the number of positive regional nodes and the survival months becomes weaker. At the undifferentiated level, the correlation is strong. AS the number of positive regional nodes increases, the survival months will decrease. 
+
+\newpage
 
 
-# Transformations
+## Logistic Regression Model
 
-```{r}
-survival_df = survival_df |>
-  mutate(
-    log_tumor_size = log(tumor_size),
-    log_regional_node_positive = log(regional_node_positive)
-  )
-```
-
-
-Since variables `tumor_size` and `regional_node_positive` are skewed to the right, we need to use the log transformation and add new variables `log_tumor_size` and `log_regional_node_positive` for further analysis.
-
-
-
-# Model Building
-
-## Preparation
+### Model Selection
 
 ```{r corr}
 survival_df = 
   survival_df |>
   mutate(status = if_else(status == "Dead", 1, 0))
-
-full_glm = glm(status ~ age + race + marital_status + t_stage + n_stage + x6th_stage +
-                 differentiate + grade + a_stage + tumor_size + estrogen_status +
-                 progesterone_status + regional_node_examined + regional_node_positive, 
-               data = survival_df, family = binomial)
-
-alias(full_glm)$Complete %>%
-  as.data.frame() %>%  
-  rownames_to_column("aliased_variables") %>% 
-  as_tibble() %>% 
-  pivot_longer(
-    cols = -aliased_variables,
-    names_to = "aliased_with", 
-    values_to = "value"
-  ) %>% 
-  filter(value != 0) %>% 
-  select(-value)
 ```
 
-First, we use variables 1-14 to build a logistic regression. In this full model, we observe that the number of each level in the variable `grade` is the same as the variable `differentiate`, and the number of level `IIIC` in the variable `x6th_stage` is exactly the same with level `N3` in the variable `n_stage`.
-
-By looking up the relevant information on the staging system for breast cancer, we can see that the breast cancer grade (i.e. variable `grade`) is based on how much the cancer cells look like normal cells, which is highly similar to the meaning of the variable `differentiate`. Therefore, the variable `grade` can be removed from the model.
-
-In addition, the AJCC system (variable `x6th_stage`) is based on 7 aspects: the extent (size) of the tumor (T), the spread to nearby lymph nodes (N), the spread (metastasis) to distant sites (M), Estrogen Receptor (ER) status, Progesterone Receptor (PR) status, HER2 status and grade of the cancer (G). It can be seen that some of the evaluation criteria are already included in other variables. 
-
-However, since the AJCC system is complex and levels other than `IIIC` do not correlate with other variables, we cannot simply remove this variable from the model. We will discuss this variable further when it comes to this.
-
-## Logistic Regression Model
-
-### Automated Procedure
-
-#### Forward Selection
 
 ```{r forward}
 full_glm = glm(status ~ age + race + marital_status + t_stage + n_stage + x6th_stage +
@@ -536,35 +374,15 @@ full_glm = glm(status ~ age + race + marital_status + t_stage + n_stage + x6th_s
                data = survival_df, family = binomial)
 
 forward_glm = MASS::stepAIC(full_glm, direction = "forward", trace = FALSE)
-
-forward_glm %>% 
-  broom::tidy() %>% 
-  knitr::kable(digits = 4, caption = "Results of Forward Selection Model", format = "pipe")
 ```
-
-#### Backward Elimination
 
 ```{r backward}
 backward_glm = MASS::stepAIC(full_glm, direction = "backward", trace = FALSE)
-
-backward_glm %>% 
-  broom::tidy() %>% 
-  knitr::kable(digits = 4, caption = "Results of Backward Elimination Model", format = "pipe")
 ```
-
-#### Stepwise Regression
 
 ```{r stepwise}
 stepwise_glm = MASS::stepAIC(full_glm, direction = "both", trace = FALSE)
-
-stepwise_glm %>% 
-  broom::tidy() %>% 
-  knitr::kable(digits = 4, caption = "Results of Stepwise Regression Model", format = "pipe")
 ```
-
-The backward and stepwise procedure produced the same model.
-
-### Criterion-based Procedure
 
 ```{r model_selection}
 model_selection =
@@ -588,6 +406,24 @@ The Akaike information criterion (AIC) is an estimator of prediction error and t
 
 By comparing AIC and BIC, we can see the model given by backward elimination or stepwise regression works slightly better than the full model or forward selection model. Therefore, we will choose the former to be our "best model".
 
+### Odds Ratios
+
+```{r}
+final_glm_summary = summary(final_glm)
+
+final_glm_df = 
+  as.data.frame(final_glm_summary$coefficients) |>
+  janitor::clean_names() |>
+  mutate(
+    adjusted_odds_ratio = exp(estimate)
+  ) |>
+  rename(p_value = pr_z)
+
+final_glm_df %>% 
+  knitr::kable(digits = 4, caption = "Final Model Results with Adjusted-Odds Ratio", format = "pipe")
+```
+
+
 ### Model Diagnostics
 
 ```{r}
@@ -600,14 +436,6 @@ Variance Inflation Factor is a commonly used method for detecting multicollinear
 The adjusted GVIF (i.e. GVIF^(1/(2*Df))) values are corrected for the degree of freedom and provide a scale similar to VIF. The high adjusted GVIF values (GVIF > 2) indicate the presence of moderate to strong multicollinearity.
 
 The table shows that most variables do not show multicollinearity, with the exception of `regional_node_positive`. Since its adjusted GVIF is not much different from 2, we will keep this variable for now.
-
-```{r, fig.cap="Residual versus Fitted Values Plot"}
-augment(final_glm) |>
-  ggplot(aes(x = .fitted, y = .std.resid)) +
-  geom_point() +
-  geom_smooth(se = FALSE) +
-  labs(x = "Fitted value", y = "Residual")
-```
 
 ```{r, fig.cap="Random Quantile Residual versus Fitted Values Plot"}
 augment_quantile(final_glm) |>
@@ -625,22 +453,8 @@ plot(final_glm, which = 5)
 
 The residual vs. leverage plot indicates that observations 3527, 1561, and 3074 may be potential outliers, but they are not necessarily influential. 
 
-### Odds Ratios
+\newpage
 
-```{r}
-final_glm_summary = summary(final_glm)
-
-final_glm_df = 
-  as.data.frame(final_glm_summary$coefficients) |>
-  janitor::clean_names() |>
-  mutate(
-    adjusted_odds_ratio = exp(estimate)
-  ) |>
-  rename(p_value = pr_z)
-
-final_glm_df %>% 
-  knitr::kable(digits = 4, caption = "Final Model Results with Adjusted-Odds Ratio", format = "pipe")
-```
 
 ### Cross Validation
 
@@ -687,7 +501,6 @@ cv_res_df %>%
   select(log_loss, AUC) %>% 
   knitr::kable(digits = 4, caption = "Results of 10-Fold Cross Validation", format = "pipe")
 ```
-
 
 After applying 10-fold cross-validation, we evaluate the goodness of fit by log loss and AUC. The mean of log loss is `r mean(cv_res_df$log_loss)`, and the mean of AUC is `r mean(cv_res_df$AUC)`.
 
@@ -803,6 +616,8 @@ inter_res_df %>%
 
 By adding interaction term `marital_status * race`, we can observe a decrease in log loss and an increase in AUC, which means an improve in the fairness between group “White” and the minority “Black” + “Other”.
 
+\newpage
+
 ## Survival Analysis
 
 ```{r prepare_survival}
@@ -848,6 +663,7 @@ log_rank_plot$plot +
   guides(color = guide_legend(nrow = 2))
 ```
 
+\newpage
 
 ### Cox Model
 
@@ -895,6 +711,11 @@ The hazard of death is highest for patients with N stage N3, followed by N2, and
 In the variable differentiated, the hazard of death is significantly highest for undifferentiated, and then decreases in the order of poorly differentiated, moderately differentiated, and well differentiated.
 
 For the variables tumor size, regional node examined, and regional node postive, we did not observe significant differences in the hazard of death.
+
+
+
+
+
 
 
 
