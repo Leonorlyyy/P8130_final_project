@@ -135,6 +135,7 @@ parts of the body remote from).
 ## Descriptive table for numerical variables
 
 ```{r, echo=FALSE}
+
 numeric_summary = survival_df |> 
   summarize(
     age_Mean = mean(age, na.rm = TRUE),
@@ -179,42 +180,113 @@ numeric_table = data.frame(
           numeric_summary$survival_months_IQR)
 )
 
+
 categorical_table = survival_df |> 
   summarize(
+    race_Black = sum(race == "Black", na.rm = TRUE),
+    race_White = sum(race == "White", na.rm = TRUE),
+    race_Other = sum(race == "Other", na.rm = TRUE),
+    
+    marital_status_Divorced = sum(marital_status == "Divorced", na.rm = TRUE),
+    marital_status_Married = sum(marital_status == "Married", na.rm = TRUE),
+    marital_status_Separated = sum(marital_status == "Separated", na.rm = TRUE),
+    marital_status_Single = sum(marital_status == "Single", na.rm = TRUE),
+    marital_status_Widowed = sum(marital_status == "Widowed", na.rm = TRUE),
+    
+    t_stage_T1 = sum(t_stage == "T1", na.rm = TRUE),
+    t_stage_T2 = sum(t_stage == "T2", na.rm = TRUE),
+    t_stage_T3 = sum(t_stage == "T3", na.rm = TRUE),
+    t_stage_T4 = sum(t_stage == "T4", na.rm = TRUE),
+    
+    n_stage_N1 = sum(n_stage == "N1", na.rm = TRUE),
+    n_stage_N2 = sum(n_stage == "N2", na.rm = TRUE),
+    n_stage_N3 = sum(n_stage == "N3", na.rm = TRUE),
+    
+    x6th_stage_IIA = sum(x6th_stage == "IIA", na.rm = TRUE),
+    x6th_stage_IIB = sum(x6th_stage == "IIB", na.rm = TRUE),
+    x6th_stage_IIIA = sum(x6th_stage == "IIIA", na.rm = TRUE),
+    x6th_stage_IIIB = sum(x6th_stage == "IIIB", na.rm = TRUE),
+    x6th_stage_IIIC = sum(x6th_stage == "IIIC", na.rm = TRUE),
+    
+    differentiate_Well = sum(differentiate == "Well differentiated", na.rm = TRUE),
+    differentiate_Moderate = sum(differentiate == "Moderately differentiated", na.rm = TRUE),
+    differentiate_Poor = sum(differentiate == "Poorly differentiated", na.rm = TRUE),
+    differentiate_Undifferentiated = sum(differentiate == "Undifferentiated", na.rm = TRUE),
+    
+    grade_1 = sum(grade == 1, na.rm = TRUE),
+    grade_2 = sum(grade == 2, na.rm = TRUE),
+    grade_3 = sum(grade == 3, na.rm = TRUE),
+    grade_4 = sum(grade == 4, na.rm = TRUE),
+    
+    a_stage_Distant = sum(a_stage == "Distant", na.rm = TRUE),
+    a_stage_Regional = sum(a_stage == "Regional", na.rm = TRUE),
+    
     estrogen_status_Positive = sum(estrogen_status == "Positive", na.rm = TRUE),
     estrogen_status_Negative = sum(estrogen_status == "Negative", na.rm = TRUE),
+    
     progesterone_status_Positive = sum(progesterone_status == "Positive", na.rm = TRUE),
     progesterone_status_Negative = sum(progesterone_status == "Negative", na.rm = TRUE),
+    
     status_Alive = sum(status == "Alive", na.rm = TRUE),
     status_Dead = sum(status == "Dead", na.rm = TRUE)
   )
 
+
 categorical_long = data.frame(
-  Variable = c("Estrogen Status Positive", "Estrogen Status Negative",
+  Variable = c("Race Black", "Race White", "Race Other",
+               "Marital Status Divorced", "Marital Status Married", "Marital Status Separated", 
+               "Marital Status Single", "Marital Status Widowed",
+               "T Stage T1", "T Stage T2", "T Stage T3", "T Stage T4",
+               "N Stage N1", "N Stage N2", "N Stage N3",
+               "6th Stage IIA", "6th Stage IIB", "6th Stage IIIA", "6th Stage IIIB", "6th Stage IIIC",
+               "Differentiate Well", "Differentiate Moderate", "Differentiate Poor",
+               "Differentiate Undifferentiated", "Grade 1", "Grade 2", "Grade 3", "Grade 4",
+               "A Stage Distant", "A Stage Regional",
+               "Estrogen Status Positive", "Estrogen Status Negative",
                "Progesterone Status Positive", "Progesterone Status Negative",
                "Status Alive", "Status Dead"),
-  Count = c(categorical_table$estrogen_status_Positive, categorical_table$estrogen_status_Negative,
-            categorical_table$progesterone_status_Positive, categorical_table$progesterone_status_Negative,
-            categorical_table$status_Alive, categorical_table$status_Dead),
+  Count = c(
+    categorical_table$race_Black, categorical_table$race_White, categorical_table$race_Other,
+    categorical_table$marital_status_Divorced, categorical_table$marital_status_Married,
+    categorical_table$marital_status_Separated, categorical_table$marital_status_Single, 
+    categorical_table$marital_status_Widowed, 
+    categorical_table$t_stage_T1, categorical_table$t_stage_T2, categorical_table$t_stage_T3, 
+    categorical_table$t_stage_T4, categorical_table$n_stage_N1, categorical_table$n_stage_N2, 
+    categorical_table$n_stage_N3, categorical_table$x6th_stage_IIA, categorical_table$x6th_stage_IIB, 
+    categorical_table$x6th_stage_IIIA, categorical_table$x6th_stage_IIIB, categorical_table$x6th_stage_IIIC, 
+    categorical_table$differentiate_Well, categorical_table$differentiate_Moderate, 
+    categorical_table$differentiate_Poor, categorical_table$differentiate_Undifferentiated, 
+    categorical_table$grade_1, categorical_table$grade_2, categorical_table$grade_3, categorical_table$grade_4,
+    categorical_table$a_stage_Distant, categorical_table$a_stage_Regional,
+    categorical_table$estrogen_status_Positive, categorical_table$estrogen_status_Negative,
+    categorical_table$progesterone_status_Positive, categorical_table$progesterone_status_Negative,
+    categorical_table$status_Alive, categorical_table$status_Dead
+  ),
   Proportion = round(c(
-    categorical_table$estrogen_status_Positive / nrow(survival_df),
-    categorical_table$estrogen_status_Negative / nrow(survival_df),
-    categorical_table$progesterone_status_Positive / nrow(survival_df),
-    categorical_table$progesterone_status_Negative / nrow(survival_df),
-    categorical_table$status_Alive / nrow(survival_df),
-    categorical_table$status_Dead / nrow(survival_df)
+    categorical_table$race_Black / nrow(survival_df), categorical_table$race_White / nrow(survival_df),
+    categorical_table$race_Other / nrow(survival_df), categorical_table$marital_status_Divorced / nrow(survival_df),
+    categorical_table$marital_status_Married / nrow(survival_df), categorical_table$marital_status_Separated / nrow(survival_df),
+    categorical_table$marital_status_Single / nrow(survival_df), categorical_table$marital_status_Widowed / nrow(survival_df),
+    categorical_table$t_stage_T1 / nrow(survival_df), categorical_table$t_stage_T2 / nrow(survival_df),
+    categorical_table$t_stage_T3 / nrow(survival_df), categorical_table$t_stage_T4 / nrow(survival_df),
+    categorical_table$n_stage_N1 / nrow(survival_df), categorical_table$n_stage_N2 / nrow(survival_df),
+    categorical_table$n_stage_N3 / nrow(survival_df), categorical_table$x6th_stage_IIA / nrow(survival_df),
+    categorical_table$x6th_stage_IIB / nrow(survival_df), categorical_table$x6th_stage_IIIA / nrow(survival_df),
+    categorical_table$x6th_stage_IIIB / nrow(survival_df), categorical_table$x6th_stage_IIIC / nrow(survival_df),
+    categorical_table$differentiate_Well / nrow(survival_df), categorical_table$differentiate_Moderate / nrow(survival_df),
+    categorical_table$differentiate_Poor / nrow(survival_df), categorical_table$differentiate_Undifferentiated / nrow(survival_df),
+    categorical_table$grade_1 / nrow(survival_df), categorical_table$grade_2 / nrow(survival_df),
+    categorical_table$grade_3 / nrow(survival_df), categorical_table$grade_4 / nrow(survival_df),
+    categorical_table$a_stage_Distant / nrow(survival_df), categorical_table$a_stage_Regional / nrow(survival_df),
+    categorical_table$estrogen_status_Positive / nrow(survival_df), categorical_table$estrogen_status_Negative / nrow(survival_df),
+    categorical_table$progesterone_status_Positive / nrow(survival_df), categorical_table$progesterone_status_Negative / nrow(survival_df),
+    categorical_table$status_Alive / nrow(survival_df), categorical_table$status_Dead / nrow(survival_df)
   ), 4)
 )
 
 categorical_long = categorical_long |> 
-  separate(Variable, into = c("Variable Name", "Level"), sep = " (?=Positive|Negative|Alive|Dead)")
-
-final_table = list(
-  Numeric_Summary = numeric_table,
-  Categorical_Summary = categorical_long
-)
+  separate(Variable, into = c("Variable Name", "Level"), sep = " (?=Black|White|Other|Divorced|Married|Separated|Single|Widowed|T1|T2|T3|T4|N1|N2|N3|IIA|IIB|IIIA|IIIB|IIIC|Well|Moderate|Poor|Undifferentiated|1|2|3|4|Distant|Regional|Positive|Negative|Alive|Dead)")
 ```
-
 
 ```{r, echo=FALSE}
 knitr::kable(numeric_table, col.names = c("Variable Name", "Mean", "SD", "Median", "IQR"), 
@@ -224,7 +296,9 @@ knitr::kable(numeric_table, col.names = c("Variable Name", "Mean", "SD", "Median
 ```{r, echo=FALSE}
 knitr::kable(categorical_long, col.names = c("Variable Name", "Level", "Count", "Proportion"), 
              caption = "Summary Statistics for Categorical Variables", format = "pipe")
+
 ```
+
 
 
 
