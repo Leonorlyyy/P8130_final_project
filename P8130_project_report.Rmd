@@ -81,18 +81,36 @@ This report was conducted using `survival_data`, which contains information abou
 
 **age**: The age of the patient (in years).
 
+**race**: The race of the patient, categorized as "Black", "Other", or "White".
+
+**marital_status**: The marital status of the patient, categorized as "Divorced", "Married", "Separated", "Single", or "Widowed".
+
+**t_stage**: Adjusted AJCC 6th T, categorized as "T1", "T2", "T3", or "T4".
+
+**n_stage**: Adjusted AJCC 6th N, categorized as "N1", "N2", or "N3".
+
+**x6th_stage**: Breast Adjusted AJCC 6th Stage, categorized as "IIA", "IIB", "IIIA", "IIIB", or "IIIC".
+
 **differentiate**: Tumor differentiation grade, categorized as "Well differentiated", "Moderately differentiated", "Poorly differentiated", or "Undifferentiated".
+
+**grade**: Tumor differentiation grade, categorized as "1", "2", "3", or "anaplastic; Grade IV".
 
 **a_stage**: Categorized as "Regional" (a neoplasm that has extended) or "Distant" (a neoplasm that has spread to
 parts of the body remote from).
 
 **tumor_size**: The size of tumor (in millimeters).
 
+**estrogen_status**: The status of the patient's estrogen, categorized as "Negative", or "Positive".
+
+**progesterone_status**: The status of the patient's progesterone, categorized as "Negative", or "Positive".
+
 **regional_node_examined**: The number of examined regional nodes.
 
 **regional_node_positive**: The number of positive regional nodes.
 
 **survival_month**: The time of a patient with breast cancer is expected to live after their diagnosis (in months).
+
+**status**: The status of the patient, categorized as "Alive", or "Dead".
 
 
 The dataset comprises a total of `r count(survival_df)` observations, with no missing values in the primary variables analyzed. Firstly, after cleaning and tidying the data, we could figure out the distributions of the data and check for potential outliers or influential points by plotting the distributions of the variables, such as histograms and box plots. We also examine the pairwise relationships between variables.
