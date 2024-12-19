@@ -66,6 +66,20 @@
 \setcounter{secnumdepth}{-\maxdimen} % remove section numbering
 \usepackage{setspace}
 \doublespacing
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage{colortbl}
+\usepackage{pdflscape}
+\usepackage{tabu}
+\usepackage{threeparttable}
+\usepackage{threeparttablex}
+\usepackage[normalem]{ulem}
+\usepackage{makecell}
+\usepackage{xcolor}
 \ifLuaTeX
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
@@ -86,53 +100,31 @@
 
 \subsection{Descriptive Tables}\label{descriptive-tables}
 
-\begin{longtable}[]{@{}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.1456}}
-  >{\raggedright\arraybackslash}p{(\columnwidth - 2\tabcolsep) * \real{0.8544}}@{}}
-\caption{Data Dictionary}\tabularnewline
-\toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
-Variable
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Description
-\end{minipage} \\
-\midrule\noalign{}
-\endfirsthead
-\toprule\noalign{}
-\begin{minipage}[b]{\linewidth}\raggedright
-Variable
-\end{minipage} & \begin{minipage}[b]{\linewidth}\raggedright
-Description
-\end{minipage} \\
-\midrule\noalign{}
-\endhead
-\bottomrule\noalign{}
-\endlastfoot
-age & The age of the patient (in years) \\
-race & The race of the patient, categorized as Black, White or Other \\
-marital\_status & The marital status of the patient, categorized as
-Divorced, Married, Separated, Single, or Widowed \\
-t\_stage & Adjusted AJCC 6th T, categorized as T1, T2, T3, or T4 \\
-n\_stage & Adjusted AJCC 6th N, categorized as N1, N2, or N3 \\
-x6th\_stage & Breast Adjusted AJCC 6th Stage, categorized as IIA, IIB,
-IIIA, IIIB, or IIIC \\
-differentiate & Tumor differentiation grade, categorized as Well
-differentiated, Moderately differentiated, Poorly differentiated, or
-Undifferentiated \\
-grade & Tumor differentiation grade, categorized as 1, 2, 3, or
-anaplastic; Grade IV \\
-a\_stage & Categorized as Regional (a neoplasm that has extended) or
-Distant (a neoplasm that has spread to parts of the body remote from) \\
-tumor\_size & The size of tumor (in millimeters) \\
-estrogen\_status & The status of the patient's estrogen, categorized as
-Positive or Negative \\
-progesterone\_status & The status of the patient's progesterone,
-categorized as Positive or Negative \\
-regional\_node\_examined & The number of examined regional nodes \\
-regional\_node\_positive & The number of positive regional nodes \\
-survival\_month & The time of a patient with breast cancer is expected
-to live after their diagnosis (in months) \\
-status & The status of the patient, categorized as Alive or Dead \\
+\begin{longtable}[t]{>{\raggedright\arraybackslash}p{12em}>{\raggedright\arraybackslash}p{32em}}
+\caption{\label{tab:data_dictionary}Data Dictionary}\\
+\toprule
+Variable & Description\\
+\midrule
+age & The age of the patient (in years)\\
+race & The race of the patient, categorized as Black, White or Other\\
+marital\_status & The marital status of the patient, categorized as Divorced, Married, Separated, Single, or Widowed\\
+t\_stage & Adjusted AJCC 6th T, categorized as T1, T2, T3, or T4\\
+n\_stage & Adjusted AJCC 6th N, categorized as N1, N2, or N3\\
+\addlinespace
+x6th\_stage & Breast Adjusted AJCC 6th Stage, categorized as IIA, IIB, IIIA, IIIB, or IIIC\\
+differentiate & Tumor differentiation grade, categorized as Well differentiated, Moderately differentiated, Poorly differentiated, or Undifferentiated\\
+grade & Tumor differentiation grade, categorized as 1, 2, 3, or anaplastic; Grade IV\\
+a\_stage & Categorized as Regional (a neoplasm that has extended) or Distant (a neoplasm that has spread to parts of the body remote from)\\
+tumor\_size & The size of tumor (in millimeters)\\
+\addlinespace
+estrogen\_status & The status of the patient's estrogen, categorized as Positive or Negative\\
+progesterone\_status & The status of the patient's progesterone, categorized as Positive or Negative\\
+regional\_node\_examined & The number of examined regional nodes\\
+regional\_node\_positive & The number of positive regional nodes\\
+survival\_month & The time of a patient with breast cancer is expected to live after their diagnosis (in months)\\
+\addlinespace
+status & The status of the patient, categorized as Alive or Dead\\
+\bottomrule
 \end{longtable}
 
 \begin{longtable}[]{@{}lrrrr@{}}

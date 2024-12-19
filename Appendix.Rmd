@@ -13,6 +13,7 @@ header-includes:
 
 ```{r setup, include=FALSE}
 library(tidyverse)
+library(kableExtra)
 library(ggplot2)
 library(car)
 library(leaps)
@@ -94,7 +95,10 @@ data_dict =
 )
 
 data_dict %>% 
-  knitr::kable(caption = "Data Dictionary")
+  knitr::kable(caption = "Data Dictionary") %>% 
+  kable_styling() %>%
+  column_spec(1, width = "12em") %>% 
+  column_spec(2, width = "32em")
 ```
 
 
