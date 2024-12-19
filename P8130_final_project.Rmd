@@ -134,7 +134,7 @@ parts of the body remote from).
 
 ## Descriptive table for numerical variables
 
-```{r}
+```{r, echo=FALSE}
 numeric_summary = survival_df |> 
   summarize(
     age_Mean = mean(age, na.rm = TRUE),
@@ -213,16 +213,19 @@ final_table = list(
   Numeric_Summary = numeric_table,
   Categorical_Summary = categorical_long
 )
+```
 
 
-cat("### Numeric Variables Summary\n")
+```{r, echo=FALSE}
 knitr::kable(numeric_table, col.names = c("Variable Name", "Mean", "SD", "Median", "IQR"), 
              caption = "Summary Statistics for Numeric Variables", format = "pipe")
+```
 
-cat("\n### Categorical Variables Summary\n")
+```{r, echo=FALSE}
 knitr::kable(categorical_long, col.names = c("Variable Name", "Level", "Count", "Proportion"), 
              caption = "Summary Statistics for Categorical Variables", format = "pipe")
 ```
+
 
 
 The majority of patients in the dataset are White, accounting for approximately 84.82% of the total population. Black patients make up 7.23%, and patients classified as "Other" constitute 7.95%. This imbalance suggests that the dataset is heavily skewed towards White patients, which could influence the generalizability of the findings to other racial groups. 
