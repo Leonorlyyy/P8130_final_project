@@ -103,6 +103,7 @@ data_dict %>%
 
 
 ```{r, echo=FALSE}
+
 numeric_summary = survival_df |> 
   summarize(
     age_Mean = mean(age, na.rm = TRUE),
@@ -183,7 +184,7 @@ categorical_table = survival_df |>
     grade_1 = sum(grade == 1, na.rm = TRUE),
     grade_2 = sum(grade == 2, na.rm = TRUE),
     grade_3 = sum(grade == 3, na.rm = TRUE),
-    grade_4 = sum(grade == 4, na.rm = TRUE),
+    grade_4 = sum(grade == "anaplastic; Grade IV", na.rm = TRUE),
     
     a_stage_Distant = sum(a_stage == "Distant", na.rm = TRUE),
     a_stage_Regional = sum(a_stage == "Regional", na.rm = TRUE),
@@ -207,7 +208,7 @@ categorical_long = data.frame(
                "N Stage N1", "N Stage N2", "N Stage N3",
                "6th Stage IIA", "6th Stage IIB", "6th Stage IIIA", "6th Stage IIIB", "6th Stage IIIC",
                "Differentiate Well", "Differentiate Moderate", "Differentiate Poor",
-               "Differentiate Undifferentiated", "Grade 1", "Grade 2", "Grade 3", "Grade 4",
+               "Differentiate Undifferentiated", "Grade 1", "Grade 2", "Grade 3", "Grade 4 or anaplastic",
                "A Stage Distant", "A Stage Regional",
                "Estrogen Status Positive", "Estrogen Status Negative",
                "Progesterone Status Positive", "Progesterone Status Negative",
@@ -252,7 +253,7 @@ categorical_long = data.frame(
 )
 
 categorical_long = categorical_long |> 
-  separate(Variable, into = c("Variable Name", "Level"), sep = " (?=Black|White|Other|Divorced|Married|Separated|Single|Widowed|T1|T2|T3|T4|N1|N2|N3|IIA|IIB|IIIA|IIIB|IIIC|Well|Moderate|Poor|Undifferentiated|1|2|3|4|Distant|Regional|Positive|Negative|Alive|Dead)")
+  separate(Variable, into = c("Variable Name", "Level"), sep = " (?=Black|White|Other|Divorced|Married|Separated|Single|Widowed|T1|T2|T3|T4|N1|N2|N3|IIA|IIB|IIIA|IIIB|IIIC|Well|Moderate|Poor|Undifferentiated|1|2|3|4 or anaplastic|Distant|Regional|Positive|Negative|Alive|Dead)")
 ```
 
 ```{r, echo=FALSE}
