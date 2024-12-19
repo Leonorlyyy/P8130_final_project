@@ -424,17 +424,7 @@ survival_df = survival_df |>
 
 Since variables `tumor_size` and `regional_node_positive` are skewed to the right, we need to use the log transformation and add new variables `log_tumor_size` and `log_regional_node_positive` for further analysis.
 
-```{r}
-survival_df |> 
-  pivot_longer(
-    cols = c(age, tumor_size, regional_node_examined, regional_node_positive, survival_months),
-    names_to = "variable",
-    values_to = "value"
-  ) |>
-  ggplot(aes(x = value)) +
-  geom_histogram() +
-  facet_wrap(variable ~ .,  scales = "free")
-```
+
 
 # Model Building
 
